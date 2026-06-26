@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOCURA — 11 Luglio 2026</title>
+  <meta name="description" content="LOCURA — 11 Luglio 2026. Parco Fiera di Barbarasco. Organized by Pro Loco Barbarasco 54012.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: {
+          'pl-nero': '#080808', 'pl-carbone': '#111111', 'pl-cenere': '#1E1E1E',
+          'pl-rosso': '#C41E2A', 'pl-bianco': '#F0EDE8', 'pl-grigio': '#888480',
+        },
+        fontFamily: { display: ['"Bebas Neue"','Impact','sans-serif'], sans: ['"DM Sans"','system-ui','sans-serif'] }
+      }}
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { opacity: 0; transition: opacity 400ms ease; }
+    :root {
+      --nero: #080808; --carbone: #111111; --cenere: #1E1E1E;
+      --rosso: #C41E2A; --bianco: #F0EDE8; --grigio: #888480; --piombo: #2A2A2A;
+    }
+    body {
+      background: var(--nero); color: var(--bianco);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-weight: 300; overflow-x: hidden;
+    }
+
+    /* ── Grain ── */
+    .grain {
+      position: fixed; inset: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 100; opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain-shift 0.5s steps(1) infinite;
+    }
+    @keyframes grain-shift {
+      0%{transform:translate(0,0)}10%{transform:translate(-2%,-3%)}20%{transform:translate(3%,2%)}
+      30%{transform:translate(-1%,4%)}40%{transform:translate(4%,-1%)}50%{transform:translate(-3%,3%)}
+      60%{transform:translate(2%,-4%)}70%{transform:translate(-4%,1%)}80%{transform:translate(1%,-2%)}
+      90%{transform:translate(-2%,4%)}100%{transform:translate(3%,-3%)}
+    }
+
+    /* ── Progress bar ── */
+    #progress-bar {
+      position: fixed; right: 0; top: 0; width: 2px; height: 100vh;
+      background: rgba(196,30,42,0.1); z-index: 90; pointer-events: none;
+    }
+    #progress-fill { width: 100%; height: 0%; background: var(--rosso); box-shadow: 0 0 8px rgba(196,30,42,0.7); }
+
+    /* ── NAV ── */
+    #loc-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      padding: 1.4rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    }
+    #loc-nav.scrolled {
+      background: rgba(8,8,8,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 1px 0 rgba(196,30,42,0.15);
+    }
+    .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 0.06em; color: var(--bianco); text-decoration: none; }
+    .nav-brand span { color: var(--rosso); }
+    .nav-back { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grigio); text-decoration: none; transition: color 200ms; }
+    .nav-back:hover { color: var(--bianco); }
+
+    /* ════════════════════════════════════════════
+       SECTION 1 — LOCANDINA
+    ════════════════════════════════════════════ */
+    #loc-hero {
+      position: relative; width: 100%; height: 100dvh; min-height: 700px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #loc-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #loc-fallback {
+      display: none; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 60%, #3a0a0e 0%, #080808 70%);
+    }
+
+    /* ── Poster ── */
+    .poster {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; padding: 6rem 1.5rem 2rem;
+      width: 100%; max-width: 900px;
+      pointer-events: none;
+    }
+
+    .p-presenter {
+      font-size: clamp(0.5rem, 1.2vw, 0.6rem); letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--grigio);
+      display: block; margin-bottom: 1rem;
+      opacity: 0; transform: translateY(14px);
+      transition: opacity 600ms cubic-bezier(0.16,1,0.3,1), transform 600ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-presenter.in { opacity: 1; transform: none; }
+
+    .p-logo-wrap {
+      margin-bottom: 1rem; position: relative; display: inline-block;
+      opacity: 0; transform: scale(0.9);
+      transition: opacity 700ms 100ms cubic-bezier(0.16,1,0.3,1), transform 700ms 100ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-logo-wrap.in { opacity: 1; transform: scale(1); }
+    .p-logo-54012 {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-family: 'Bebas Neue', Impact, sans-serif; font-style: italic;
+      font-size: 0.72rem; color: var(--bianco); white-space: nowrap; pointer-events: none;
+      text-shadow: 1px 1px 0 rgba(196,30,42,0.5);
+    }
+
+    .p-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6.5rem, 22vw, 20rem); line-height: 0.85;
+      color: var(--bianco); display: block; letter-spacing: -0.01em;
+      opacity: 0; transform: translateY(30px) scaleY(0.95);
+      transition: opacity 900ms 200ms cubic-bezier(0.16,1,0.3,1), transform 900ms 200ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-title.in { opacity: 1; transform: none; }
+
+    .p-rule {
+      width: clamp(160px, 40vw, 380px); height: 1px; background: var(--rosso);
+      margin: 0.9rem 0; flex-shrink: 0;
+      opacity: 0; transform: scaleX(0);
+      transform-origin: center;
+      transition: opacity 500ms cubic-bezier(0.16,1,0.3,1), transform 500ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-rule.in { opacity: 1; transform: scaleX(1); }
+
+    .p-date-line {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.2rem, 3.5vw, 2.8rem); line-height: 1;
+      letter-spacing: 0.08em; display: flex; align-items: baseline; gap: 0.4em; flex-wrap: wrap; justify-content: center;
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 700ms 350ms cubic-bezier(0.16,1,0.3,1), transform 700ms 350ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-date-line.in { opacity: 1; transform: none; }
+    .p-date-w { color: var(--bianco); }
+    .p-date-accent { color: transparent; -webkit-text-stroke: 1px var(--rosso); }
+    .p-date-y { color: var(--bianco); }
+
+    .p-lineup {
+      margin: 1.2rem 0; width: 100%;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 700ms 450ms cubic-bezier(0.16,1,0.3,1), transform 700ms 450ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-lineup.in { opacity: 1; transform: none; }
+    .p-lrow {
+      display: flex; align-items: baseline; justify-content: center;
+      gap: clamp(0.6rem, 2vw, 2rem);
+      padding: clamp(0.2rem, 0.6vh, 0.45rem) 0;
+      border-top: 1px solid rgba(240,237,232,0.05);
+    }
+    .p-lrow:last-child { border-bottom: 1px solid rgba(240,237,232,0.05); }
+    .p-ltime {
+      font-size: clamp(0.5rem, 1.2vw, 0.6rem); letter-spacing: 0.2em;
+      color: var(--rosso); font-weight: 400; width: 3.5em; text-align: right; flex-shrink: 0;
+    }
+    .p-lname {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.2rem, 3.2vw, 2.8rem); line-height: 1; color: var(--bianco);
+      letter-spacing: 0.02em; text-align: left;
+    }
+
+    .p-venue {
+      font-size: clamp(0.52rem, 1.3vw, 0.62rem); letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--grigio);
+      margin-top: 1rem;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 600ms 600ms cubic-bezier(0.16,1,0.3,1), transform 600ms 600ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-venue.in { opacity: 1; transform: none; }
+
+    .p-entry {
+      font-size: clamp(0.48rem, 1.1vw, 0.58rem); letter-spacing: 0.22em;
+      text-transform: uppercase; color: rgba(136,132,128,0.5);
+      margin-top: 0.4rem;
+      opacity: 0;
+      transition: opacity 600ms 700ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-entry.in { opacity: 1; }
+
+    .p-inspired {
+      position: absolute; bottom: 1.5rem; right: 2rem;
+      font-size: 0.6rem; letter-spacing: 0.06em; font-style: italic;
+      color: rgba(136,132,128,0.3); pointer-events: none;
+      opacity: 0; transition: opacity 800ms 800ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .p-inspired.in { opacity: 1; }
+
+    /* ── Scroll indicator ── */
+    #loc-scroll-ind {
+      position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      z-index: 3; display: flex; flex-direction: column; align-items: center;
+      gap: 0.5rem; color: var(--grigio); font-size: 0.52rem;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      opacity: 0; transition: opacity 800ms 950ms ease;
+    }
+    #loc-scroll-ind.in { opacity: 1; }
+    #loc-scroll-ind.hide { opacity: 0; pointer-events: none; transition: opacity 400ms ease; }
+    .loc-scroll-arrow {
+      width: 1px; height: 2rem;
+      background: linear-gradient(to bottom, var(--rosso), transparent);
+      animation: arrow-pulse 2s ease-in-out infinite;
+    }
+    @keyframes arrow-pulse { 0%,100%{transform:scaleY(1);opacity:.5} 50%{transform:scaleY(1.3);opacity:1} }
+
+    /* ════════════════════════════════════════════
+       SECTION 2 — MAP ZOOM
+    ════════════════════════════════════════════ */
+    #loc-map {
+      position: relative; width: 100%; height: 100vh;
+      overflow: hidden; background: var(--nero);
+    }
+
+    /* Map background grid — scales on scroll */
+    #map-bg {
+      position: absolute; inset: -40%; width: 180%; height: 180%;
+      will-change: transform; transform-origin: center center;
+      pointer-events: none;
+    }
+    .map-grid-svg {
+      width: 100%; height: 100%;
+    }
+
+    /* Shared layer styles */
+    .map-layer {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; pointer-events: none;
+      will-change: opacity;
+    }
+
+    /* ── Layer A: Italia — LOCURA intro ── */
+    #ml-a { opacity: 1; }
+    .ml-a-tag {
+      font-size: clamp(0.5rem, 1.2vw, 0.62rem); letter-spacing: 0.38em;
+      text-transform: uppercase; color: var(--rosso); margin-bottom: 1rem;
+    }
+    .ml-a-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 20vw, 18rem); line-height: 0.85;
+      color: var(--bianco); letter-spacing: -0.01em;
+    }
+    .ml-a-rule {
+      width: clamp(80px, 20vw, 160px); height: 1px;
+      background: var(--rosso); margin: 1rem 0;
+    }
+    .ml-a-sub {
+      font-size: clamp(0.62rem, 1.5vw, 0.8rem); line-height: 1.8;
+      color: var(--grigio); max-width: 38ch; text-align: center;
+    }
+    .ml-a-sub em { color: var(--bianco); font-style: normal; }
+    .ml-a-circle {
+      width: clamp(120px, 18vw, 220px); height: clamp(120px, 18vw, 220px);
+      border-radius: 50%; border: 1px solid rgba(196,30,42,0.3);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+    .ml-a-circle::after {
+      content: ''; position: absolute; inset: -20px;
+      border-radius: 50%; border: 1px solid rgba(196,30,42,0.12);
+      animation: pulse-ring 3s ease-in-out infinite 0.7s;
+    }
+    @keyframes pulse-ring {
+      0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.6; }
+      50% { transform: translate(-50%,-50%) scale(1.06); opacity: 1; }
+    }
+
+    /* ── Layer B: Toscana ── */
+    #ml-b { opacity: 0; }
+    .ml-b-region {
+      font-size: clamp(0.55rem, 1.4vw, 0.7rem); letter-spacing: 0.38em;
+      text-transform: uppercase; color: var(--rosso); margin-bottom: 1rem;
+    }
+    .ml-b-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 14vw, 12rem); line-height: 0.85;
+      color: transparent; -webkit-text-stroke: 1px rgba(240,237,232,0.55);
+      letter-spacing: 0.04em;
+    }
+    .ml-b-desc {
+      font-size: clamp(0.65rem, 1.6vw, 0.85rem); line-height: 1.7;
+      color: var(--grigio); margin-top: 1.4rem; max-width: 36ch;
+      text-align: center;
+    }
+    .ml-b-desc em { color: var(--bianco); font-style: normal; }
+
+    /* ── Layer C: Provincia ── */
+    #ml-c { opacity: 0; }
+    .ml-c-region {
+      font-size: clamp(0.52rem, 1.2vw, 0.65rem); letter-spacing: 0.38em;
+      text-transform: uppercase; color: var(--rosso); margin-bottom: 0.9rem;
+    }
+    .ml-c-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 11vw, 10rem); line-height: 0.88;
+      color: var(--bianco); letter-spacing: 0.02em;
+    }
+    .ml-c-coord {
+      font-size: clamp(0.52rem, 1.3vw, 0.68rem); letter-spacing: 0.28em;
+      text-transform: uppercase; color: rgba(136,132,128,0.65); margin-top: 1.2rem;
+    }
+
+    /* ── Layer D: Barbarasco ── */
+    #ml-d { opacity: 0; }
+    .ml-d-tag {
+      font-size: clamp(0.52rem, 1.2vw, 0.65rem); letter-spacing: 0.38em;
+      text-transform: uppercase; color: var(--rosso); margin-bottom: 0.9rem;
+    }
+    .ml-d-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 18vw, 16rem); line-height: 0.82;
+      color: transparent; -webkit-text-stroke: 1.5px rgba(240,237,232,0.7);
+      letter-spacing: 0.03em;
+    }
+    .ml-d-sub {
+      font-size: clamp(0.6rem, 1.4vw, 0.75rem); letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--grigio); margin-top: 1.2rem;
+    }
+    .ml-d-pop {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 6vw, 5rem); color: var(--rosso);
+      margin-top: 0.6rem; line-height: 1;
+    }
+    .ml-d-pop-label {
+      font-size: clamp(0.5rem, 1.1vw, 0.6rem); letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--grigio); display: block;
+      margin-top: 0.2rem;
+    }
+
+    /* ── Layer E: Venue / Crosshair ── */
+    #ml-e { opacity: 0; }
+    .ch-h, .ch-v {
+      position: absolute; background: rgba(196,30,42,0.45);
+      transform-origin: center;
+    }
+    .ch-h { top: 50%; left: 0; width: 100%; height: 1px; transform: scaleX(0); }
+    .ch-v { left: 50%; top: 0; width: 1px; height: 100%; transform: scaleY(0); }
+    .ch-dot {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--rosso); box-shadow: 0 0 20px rgba(196,30,42,0.8), 0 0 40px rgba(196,30,42,0.3);
+    }
+    .ch-ring {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 1px solid rgba(196,30,42,0.45);
+    }
+    .ml-e-label {
+      position: relative; z-index: 2; margin-top: -1.5rem;
+      font-size: clamp(0.52rem, 1.2vw, 0.65rem); letter-spacing: 0.32em;
+      text-transform: uppercase; color: var(--rosso);
+      background: rgba(8,8,8,0.8); padding: 0.25rem 1rem;
+    }
+    .ml-e-venue {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 6rem); line-height: 0.88;
+      color: var(--bianco); margin-top: 0.3rem; position: relative; z-index: 2;
+    }
+    .ml-e-coords {
+      font-size: clamp(0.45rem, 1.1vw, 0.58rem); letter-spacing: 0.22em;
+      color: rgba(136,132,128,0.65); margin-top: 0.5rem; position: relative; z-index: 2;
+    }
+    .ml-e-date {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.8rem); letter-spacing: 0.1em;
+      color: var(--rosso); margin-top: 1.2rem; position: relative; z-index: 2;
+    }
+    .ml-e-cd {
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: clamp(0.8rem, 2vw, 2.5rem); margin-top: 1.5rem; position: relative; z-index: 2;
+    }
+    .ml-cd-block { display: flex; flex-direction: column; align-items: center; }
+    .ml-cd-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1;
+      color: var(--bianco); min-width: 2ch; text-align: center;
+    }
+    .ml-cd-unit {
+      font-size: 0.45rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--grigio); margin-top: 0.3rem;
+    }
+    .ml-cd-sep {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1;
+      color: var(--rosso); opacity: 0.4; user-select: none;
+    }
+    .ml-e-entry {
+      font-size: clamp(0.46rem, 1vw, 0.56rem); letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--grigio); margin-top: 0.8rem;
+      display: flex; align-items: center; gap: 0.8rem; position: relative; z-index: 2;
+    }
+    .ml-e-entry-sep { width: 1rem; height: 1px; background: var(--piombo); }
+
+    /* ════════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════════ */
+    #loc-footer {
+      background: var(--nero); padding: 5rem 1.5rem 3rem;
+      text-align: center; border-top: 1px solid var(--piombo);
+    }
+    .lf-logo { margin: 0 auto 1.8rem; width: 70px; }
+    .lf-name { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.08em; color: var(--bianco); margin-bottom: 0.3rem; }
+    .lf-sub { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grigio); }
+    .lf-rule { width: 1px; height: 2.5rem; background: var(--piombo); margin: 1.8rem auto; }
+    .lf-ig { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grigio); text-decoration: none; transition: color 200ms; }
+    .lf-ig:hover { color: var(--bianco); }
+    .lf-copy { font-size: 0.55rem; color: var(--piombo); letter-spacing: 0.1em; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div id="progress-bar" aria-hidden="true"><div id="progress-fill"></div></div>
+
+<!-- Nav -->
+<nav id="loc-nav" aria-label="Navigazione">
+  <a href="#" class="nav-brand">Locura <span>11.07.26</span></a>
+  <a href="index.html" class="nav-back">← Pro Loco 54012</a>
+</nav>
+
+<!-- ══ SEZIONE 1: LOCANDINA ══ -->
+<section id="loc-hero" aria-label="LOCURA">
+  <canvas id="loc-canvas" aria-hidden="true"></canvas>
+  <div id="loc-fallback" aria-hidden="true"></div>
+
+  <div class="poster" id="poster">
+    <span class="p-presenter" id="p-presenter">Pro Loco Barbarasco 54012 · Presenta</span>
+
+    <div class="p-logo-wrap" id="p-logo">
+      <svg viewBox="0 0 320 210" width="80" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" color="#F0EDE8">
+        <defs>
+          <clipPath id="po-clip"><ellipse cx="160" cy="105" rx="144" ry="90"/></clipPath>
+          <pattern id="po-ht" x="0" y="0" width="7" height="7" patternUnits="userSpaceOnUse">
+            <circle cx="3.5" cy="3.5" r="1.4" fill="rgba(240,237,232,0.4)"/>
+          </pattern>
+        </defs>
+        <ellipse cx="160" cy="105" rx="158" ry="101" stroke="currentColor" stroke-width="5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="148" ry="94" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="144" ry="90" fill="#0a0a0a"/>
+        <g clip-path="url(#po-clip)" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.45">
+          <ellipse cx="160" cy="105" rx="144" ry="18"/>
+          <ellipse cx="160" cy="105" rx="144" ry="40"/>
+          <ellipse cx="160" cy="105" rx="144" ry="62"/>
+          <ellipse cx="160" cy="105" rx="114" ry="90"/>
+        </g>
+        <line x1="160" y1="0" x2="160" y2="210" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="105" x2="320" y2="105" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="16" y="65" width="288" height="80" fill="#080808"/>
+        <line x1="16" y1="65"  x2="304" y2="65"  stroke="currentColor" stroke-width="1.2"/>
+        <line x1="16" y1="145" x2="304" y2="145" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span class="p-logo-54012">54012</span>
+    </div>
+
+    <span class="p-title" id="p-title">Locura</span>
+
+    <div class="p-rule" id="p-rule1"></div>
+
+    <div class="p-date-line" id="p-date">
+      <span class="p-date-w">Sabato</span>
+      <span class="p-date-accent">11 Luglio</span>
+      <span class="p-date-y">2026</span>
+    </div>
+
+    <div class="p-rule" id="p-rule2" style="transition-delay: 420ms;"></div>
+
+    <div class="p-lineup" id="p-lineup">
+      <div class="p-lrow">
+        <span class="p-ltime">22:00</span>
+        <span class="p-lname">Selezione Tech House</span>
+      </div>
+      <div class="p-lrow">
+        <span class="p-ltime">23:00</span>
+        <span class="p-lname">DJ Nash</span>
+      </div>
+      <div class="p-lrow">
+        <span class="p-ltime">01:00</span>
+        <span class="p-lname">Technobrother</span>
+      </div>
+      <div class="p-lrow">
+        <span class="p-ltime">02:00</span>
+        <span class="p-lname">Blace</span>
+      </div>
+    </div>
+
+    <span class="p-venue" id="p-venue">Parco Fiera di Barbarasco · Ore 18:00</span>
+    <span class="p-entry" id="p-entry">Ingresso libero fino alle 00:30 · €5 dopo mezzanotte</span>
+
+    <span class="p-inspired" id="p-inspired">Inspired by Circoloco</span>
+  </div>
+
+  <div id="loc-scroll-ind" aria-hidden="true">
+    <div class="loc-scroll-arrow"></div>
+    <span>Scorri</span>
+  </div>
+</section>
+
+<!-- ══ SEZIONE 2: MAP ZOOM ══ -->
+<section id="loc-map" aria-label="Luogo">
+
+  <!-- Map background grid -->
+  <div id="map-bg" aria-hidden="true">
+    <svg class="map-grid-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid-sm" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(196,30,42,0.08)" stroke-width="0.5"/>
+        </pattern>
+        <pattern id="grid-lg" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse">
+          <rect width="180" height="180" fill="url(#grid-sm)"/>
+          <path d="M 180 0 L 0 0 0 180" fill="none" stroke="rgba(196,30,42,0.14)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grid-lg)"/>
+      <!-- Italy outline: Massa-Carrara (Barbarasco) at origin (0,0), scale 25px/lon° 35px/lat° -->
+      <svg x="0" y="0" width="100%" height="100%" viewBox="-200 -210 400 420" preserveAspectRatio="xMidYMid meet">
+        <path d="M -65,7 L -30,-14 L -8,-4 L 5,18 L 10,39 L 18,46 L 43,67 L 53,77 L 63,88 L 88,98 L 100,112 L 118,115 L 130,136 L 143,147 L 145,175 L 138,214 L 153,211 L 173,175 L 178,123 L 198,119 L 210,140 L 208,147 L 195,145 L 195,130 L 170,102 L 153,74 L 168,60 L 143,72 L 123,70 L 103,53 L 85,15 L 63,0 L 55,-49 L 93,-56 L 88,-88 L 35,-105 L -78,-60 Z"
+          fill="rgba(196,30,42,0.05)" stroke="rgba(196,30,42,0.30)" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Barbarasco / La Spezia marker -->
+        <circle cx="0" cy="0" r="3.5" fill="#C41E2A" opacity="0.9"/>
+        <circle cx="0" cy="0" r="9" fill="none" stroke="rgba(196,30,42,0.45)" stroke-width="1"/>
+        <circle cx="0" cy="0" r="18" fill="none" stroke="rgba(196,30,42,0.2)" stroke-width="0.7"/>
+      </svg>
+      <!-- Concentric circles around venue point -->
+      <circle cx="50%" cy="50%" r="6%" fill="none" stroke="rgba(196,30,42,0.12)" stroke-width="1"/>
+      <circle cx="50%" cy="50%" r="12%" fill="none" stroke="rgba(196,30,42,0.09)" stroke-width="0.7"/>
+      <circle cx="50%" cy="50%" r="20%" fill="none" stroke="rgba(196,30,42,0.07)" stroke-width="0.5"/>
+      <circle cx="50%" cy="50%" r="30%" fill="none" stroke="rgba(196,30,42,0.05)" stroke-width="0.4"/>
+      <circle cx="50%" cy="50%" r="42%" fill="none" stroke="rgba(196,30,42,0.04)" stroke-width="0.3"/>
+    </svg>
+  </div>
+
+  <!-- Layer A: Italia — LOCURA intro (visible at start) -->
+  <div class="map-layer" id="ml-a" aria-hidden="true">
+    <div class="ml-a-circle"></div>
+    <div class="ml-a-tag">Pro Loco Barbarasco 54012 · Presenta</div>
+    <div class="ml-a-title">Locura</div>
+    <div class="ml-a-rule"></div>
+    <div class="ml-a-sub">Un <em>rave open air</em> nel cuore della Toscana.<br>Techno, tech house e libertà totale.</div>
+  </div>
+
+  <!-- Layer B: Toscana -->
+  <div class="map-layer" id="ml-b" aria-hidden="true">
+    <div class="ml-b-region">Toscana · Italia</div>
+    <div class="ml-b-title">Toscana</div>
+    <div class="ml-b-desc">Ispirato a <em>Circoloco</em>, il format che ha<br>rivoluzionato il clubbing mondiale.<br>Un'intera notte tra musica, natura e comunità.</div>
+  </div>
+
+  <!-- Layer C: Provincia Massa-Carrara -->
+  <div class="map-layer" id="ml-c" aria-hidden="true">
+    <div class="ml-c-region">Provincia di Massa-Carrara</div>
+    <div class="ml-c-title">Massa<br>Carrara</div>
+    <div class="ml-c-coord">44°03′N &nbsp;·&nbsp; 10°05′E</div>
+  </div>
+
+  <!-- Layer D: Barbarasco -->
+  <div class="map-layer" id="ml-d" aria-hidden="true">
+    <div class="ml-d-tag">Frazione di Tresana · MS</div>
+    <div class="ml-d-title">Barbarasco</div>
+    <div class="ml-d-sub">Codice postale</div>
+    <div class="ml-d-pop">54012</div>
+    <div class="ml-d-pop-label">Lunigiana · Alta Toscana</div>
+  </div>
+
+  <!-- Layer E: Parco Fiera — crosshair + countdown -->
+  <div class="map-layer" id="ml-e" aria-hidden="true">
+    <div class="ch-h" id="ch-h"></div>
+    <div class="ch-v" id="ch-v"></div>
+    <div class="ch-ring"></div>
+    <div class="ch-dot"></div>
+    <div class="ml-e-label">— Parco Fiera —</div>
+    <div class="ml-e-venue">Barbarasco</div>
+    <div class="ml-e-coords">44°03′26″N &nbsp; 10°05′52″E</div>
+    <div class="ml-e-date">11 · 07 · 2026 &nbsp;·&nbsp; Ore 18:00</div>
+    <div class="ml-e-cd">
+      <div class="ml-cd-block">
+        <span class="ml-cd-num" id="lcd-days">54</span>
+        <span class="ml-cd-unit">Giorni</span>
+      </div>
+      <span class="ml-cd-sep" aria-hidden="true">:</span>
+      <div class="ml-cd-block">
+        <span class="ml-cd-num" id="lcd-hours">00</span>
+        <span class="ml-cd-unit">Ore</span>
+      </div>
+      <span class="ml-cd-sep" aria-hidden="true">:</span>
+      <div class="ml-cd-block">
+        <span class="ml-cd-num" id="lcd-mins">00</span>
+        <span class="ml-cd-unit">Minuti</span>
+      </div>
+      <span class="ml-cd-sep" aria-hidden="true">:</span>
+      <div class="ml-cd-block">
+        <span class="ml-cd-num" id="lcd-secs">00</span>
+        <span class="ml-cd-unit">Secondi</span>
+      </div>
+    </div>
+    <div class="ml-e-entry">
+      <span>Ingresso libero fino alle 00:30</span>
+      <div class="ml-e-entry-sep"></div>
+      <span style="color:var(--rosso)">€5 dopo mezzanotte</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer id="loc-footer">
+  <div class="lf-logo">
+    <div style="position:relative;display:inline-block;">
+      <svg viewBox="0 0 320 210" width="70" height="46" fill="none" xmlns="http://www.w3.org/2000/svg" color="#F0EDE8">
+        <defs>
+          <clipPath id="lf-go"><ellipse cx="160" cy="105" rx="144" ry="90"/></clipPath>
+        </defs>
+        <ellipse cx="160" cy="105" rx="158" ry="101" stroke="currentColor" stroke-width="5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="148" ry="94" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="144" ry="90" fill="#0a0a0a"/>
+        <g clip-path="url(#lf-go)" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.45">
+          <ellipse cx="160" cy="105" rx="144" ry="18"/>
+          <ellipse cx="160" cy="105" rx="144" ry="40"/>
+          <ellipse cx="160" cy="105" rx="144" ry="62"/>
+          <ellipse cx="160" cy="105" rx="114" ry="90"/>
+        </g>
+        <line x1="160" y1="0" x2="160" y2="210" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="105" x2="320" y2="105" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="16" y="65" width="288" height="80" fill="#080808"/>
+        <line x1="16" y1="65"  x2="304" y2="65"  stroke="currentColor" stroke-width="1.2"/>
+        <line x1="16" y1="145" x2="304" y2="145" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',Impact,sans-serif;font-style:italic;font-size:0.75rem;color:#F0EDE8;white-space:nowrap;pointer-events:none;">54012</span>
+    </div>
+  </div>
+  <div class="lf-name">Pro Loco Barbarasco 54012</div>
+  <div class="lf-sub">Barbarasco, Massa-Carrara — Toscana</div>
+  <div class="lf-rule"></div>
+  <a href="https://www.instagram.com/barbarasco54012/" target="_blank" rel="noopener" class="lf-ig">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+    </svg>
+    @barbarasco54012
+  </a>
+  <div class="lf-copy">© 2025 Pro Loco Barbarasco 54012 — Tutti i diritti riservati</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<script>
+(function () {
+  'use strict';
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── Progress bar ──────────────────────────────────────────────
+  var pFill = document.getElementById('progress-fill');
+  window.addEventListener('scroll', function () {
+    var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    if (pFill) pFill.style.height = Math.min(pct, 100) + '%';
+  }, { passive: true });
+
+  // ── Page reveal (locandina stagger) ───────────────────────────
+  window.addEventListener('load', function () {
+    document.documentElement.style.opacity = '1';
+    var seq = [
+      { id: 'p-presenter', delay: 200 },
+      { id: 'p-logo',      delay: 320 },
+      { id: 'p-title',     delay: 440 },
+      { id: 'p-rule1',     delay: 560 },
+      { id: 'p-date',      delay: 600 },
+      { id: 'p-rule2',     delay: 640 },
+      { id: 'p-lineup',    delay: 720 },
+      { id: 'p-venue',     delay: 820 },
+      { id: 'p-entry',     delay: 900 },
+      { id: 'p-inspired',  delay: 980 },
+      { id: 'loc-scroll-ind', delay: 1050 },
+    ];
+    seq.forEach(function (s) {
+      var el = document.getElementById(s.id);
+      if (el) setTimeout(function () { el.classList.add('in'); }, s.delay);
+    });
+    // force-show: bypass transitions for screenshots / slow loads
+    setTimeout(function () {
+      seq.forEach(function (s) {
+        var el = document.getElementById(s.id);
+        if (!el) return;
+        el.style.transition = 'none';
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.classList.add('in');
+      });
+    }, 250);
+  });
+
+  // ── WebGL hero shader ──────────────────────────────────────────
+  var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768;
+  var lcCanvas  = document.getElementById('loc-canvas');
+  var lcFallback = document.getElementById('loc-fallback');
+  var lcMat = null;
+
+  if (isMobile || typeof THREE === 'undefined') {
+    lcCanvas.style.display = 'none';
+    lcFallback.style.display = 'block';
+  } else {
+    try {
+      var lcRenderer = new THREE.WebGLRenderer({ canvas: lcCanvas, alpha: false, antialias: false });
+      lcRenderer.setSize(window.innerWidth, window.innerHeight);
+      lcRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      var lcScene = new THREE.Scene();
+      var lcCam   = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      var lcGeo   = new THREE.PlaneGeometry(2, 2);
+      lcMat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime:   { value: 0.0 },
+          uMouse:  { value: new THREE.Vector2(0.5, 0.5) },
+          uScroll: { value: 0.0 },
+        },
+        vertexShader: 'varying vec2 vUv; void main(){vUv=uv;gl_Position=vec4(position,1.0);}',
+        fragmentShader: [
+          'precision mediump float;',
+          'uniform float uTime,uScroll; uniform vec2 uMouse; varying vec2 vUv;',
+          'float hash(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}',
+          'float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);',
+          'return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}',
+          'float fbm(vec2 p){float v=0.0,a=0.5;',
+          'for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.1+vec2(1.7,9.2);a*=0.5;}return v;}',
+          'void main(){',
+          'vec2 uv=(vUv-0.5)*(1.0-uScroll*0.18)+0.5;',
+          'vec2 mv=uv-uMouse; float md=length(mv)+0.001;',
+          'float rip=sin(md*28.0-uTime*2.6)*0.007*exp(-md*4.5);',
+          'uv+=rip*mv/md;',
+          'vec2 q=vec2(fbm(uv*2.8+uTime*0.055),fbm(uv*2.8+vec2(1.3,0.7)+uTime*0.048));',
+          'float n=fbm(uv*2.2+q+uTime*0.038);',
+          'vec3 dark=vec3(0.024,0.008,0.010),mid=vec3(0.18,0.038,0.045),bright=vec3(0.44,0.068,0.095);',
+          'vec3 col=mix(dark,mid,smoothstep(0.22,0.54,n));',
+          'col=mix(col,bright,smoothstep(0.54,0.82,n)*0.55);',
+          'col.r+=uScroll*0.28; col.gb*=(1.0-uScroll*0.35);',
+          'float vig=1.0-smoothstep(0.12,0.85,length(vUv-0.5)*1.65);',
+          'float vigT=1.0-smoothstep(0.05,0.72,length(vUv-0.5)*(1.85+uScroll*2.2));',
+          'col*=vig*vigT;',
+          'gl_FragColor=vec4(col,1.0);}',
+        ].join('\n'),
+      });
+      lcScene.add(new THREE.Mesh(lcGeo, lcMat));
+      document.addEventListener('mousemove', function (e) {
+        if (lcMat) lcMat.uniforms.uMouse.value.set(e.clientX/window.innerWidth, 1-e.clientY/window.innerHeight);
+      }, { passive: true });
+      window.addEventListener('resize', function () {
+        lcRenderer.setSize(window.innerWidth, window.innerHeight);
+      }, { passive: true });
+      (function animate(t) {
+        requestAnimationFrame(animate);
+        if (document.visibilityState !== 'visible') return;
+        if (lcMat) lcMat.uniforms.uTime.value = t * 0.001;
+        lcRenderer.render(lcScene, lcCam);
+      })(0);
+    } catch(e) {
+      lcCanvas.style.display = 'none'; lcFallback.style.display = 'block';
+    }
+  }
+
+  // ── Hero cinematic exit ────────────────────────────────────────
+  gsap.to('#p-presenter, #p-inspired', {
+    opacity: 0, letterSpacing: '0.5em', ease: 'none',
+    scrollTrigger: { trigger: '#loc-hero', start: 'top top', end: '30% top', scrub: true }
+  });
+  gsap.to('#p-title', {
+    y: -140, scaleY: 1.25, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#loc-hero', start: '5% top', end: '68% top', scrub: true }
+  });
+  gsap.to('#p-date, #p-rule1, #p-rule2', {
+    y: 90, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#loc-hero', start: 'top top', end: '52% top', scrub: true }
+  });
+  gsap.to('#p-lineup', {
+    y: 60, opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#loc-hero', start: '8% top', end: '58% top', scrub: true }
+  });
+  gsap.to('#p-venue, #p-entry, #p-logo', {
+    opacity: 0, ease: 'none',
+    scrollTrigger: { trigger: '#loc-hero', start: '5% top', end: '42% top', scrub: true }
+  });
+  gsap.to('#loc-canvas, #loc-fallback', {
+    y: 60, ease: 'none',
+    scrollTrigger: {
+      trigger: '#loc-hero', start: 'top top', end: 'bottom top', scrub: true,
+      onUpdate: function (self) { if (lcMat) lcMat.uniforms.uScroll.value = self.progress; }
+    }
+  });
+
+  // ── Scroll indicator ──────────────────────────────────────────
+  var scrollInd = document.getElementById('loc-scroll-ind');
+  window.addEventListener('scroll', function () {
+    if (scrollInd) scrollInd.classList.toggle('hide', window.scrollY > 80);
+  }, { passive: true });
+
+  // ── Nav scroll ────────────────────────────────────────────────
+  var locNav = document.getElementById('loc-nav');
+  var heroEl = document.getElementById('loc-hero');
+  window.addEventListener('scroll', function () {
+    if (locNav && heroEl) locNav.classList.toggle('scrolled', window.scrollY > heroEl.offsetHeight * 0.5);
+  }, { passive: true });
+
+  // ── MAP ZOOM (ScrollTrigger pin) ──────────────────────────────
+  var mlA = document.getElementById('ml-a');
+  var mlB = document.getElementById('ml-b');
+  var mlC = document.getElementById('ml-c');
+  var mlD = document.getElementById('ml-d');
+  var mlE = document.getElementById('ml-e');
+  var chH = document.getElementById('ch-h');
+  var chV = document.getElementById('ch-v');
+
+  function ss(lo, hi, x) {
+    var t = Math.max(0, Math.min(1, (x - lo) / (hi - lo)));
+    return t * t * (3 - 2 * t);
+  }
+
+  var maxScale = isMobile ? 3 : 6;
+
+  var mapST = ScrollTrigger.create({
+    trigger: '#loc-map',
+    pin: true,
+    start: 'top top',
+    end: '+=450%',
+    scrub: 1,
+    onUpdate: function (self) {
+      var p = self.progress;
+
+      var scl = 1 + (maxScale - 1) * p;
+      var rot = p * 3;
+      document.getElementById('map-bg').style.transform = 'scale(' + scl + ') rotate(' + rot + 'deg)';
+
+      // A: Italia intro — fades out 0.15→0.28
+      mlA.style.opacity = 1 - ss(0.15, 0.28, p);
+
+      // B: Toscana — fades in 0.15→0.28, out 0.33→0.46
+      mlB.style.opacity = ss(0.15, 0.28, p) * (1 - ss(0.33, 0.46, p));
+
+      // C: Massa-Carrara — fades in 0.33→0.46, out 0.50→0.63
+      mlC.style.opacity = ss(0.33, 0.46, p) * (1 - ss(0.50, 0.63, p));
+
+      // D: Barbarasco — fades in 0.50→0.63, out 0.67→0.80
+      mlD.style.opacity = ss(0.50, 0.63, p) * (1 - ss(0.67, 0.80, p));
+
+      // E: Parco Fiera — fades in 0.67→0.80, stays
+      var eOp = ss(0.67, 0.80, p);
+      mlE.style.opacity = eOp;
+      if (chH) chH.style.transform = 'scaleX(' + eOp + ')';
+      if (chV) chV.style.transform = 'scaleY(' + eOp + ')';
+    }
+  });
+
+  // ── Countdown ────────────────────────────────────────────────
+  var cdTarget = new Date('2026-07-11T18:00:00');
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function updateCD() {
+    var diff = cdTarget - new Date();
+    if (diff <= 0) return;
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    var ed = document.getElementById('lcd-days'),
+        eh = document.getElementById('lcd-hours'),
+        em = document.getElementById('lcd-mins'),
+        es = document.getElementById('lcd-secs');
+    if (ed) ed.textContent = pad(d);
+    if (eh) eh.textContent = pad(h);
+    if (em) em.textContent = pad(m);
+    if (es) es.textContent = pad(s);
+  }
+  setInterval(updateCD, 1000);
+  updateCD();
+
+}());
+</script>
+</body>
+</html>

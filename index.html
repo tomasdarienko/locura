@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOCURA — 11 Luglio 2026 · Barbarasco</title>
+  <meta name="description" content="LOCURA — 11 Luglio 2026. Parco Fiera di Barbarasco. Organizzato da Pro Loco Barbarasco 54012.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        fontFamily: { display: ['"Bebas Neue"','Impact','sans-serif'], sans: ['"DM Sans"','system-ui','sans-serif'] }
+      }}
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { opacity: 0; transition: opacity 350ms ease; }
+    :root {
+      --nero: #080808; --rosso: #C41E2A; --bianco: #F0EDE8;
+      --grigio: #888480; --piombo: #2A2A2A;
+    }
+    body { background: var(--nero); color: var(--bianco); font-family: 'DM Sans', system-ui, sans-serif; font-weight: 300; overflow-x: hidden; cursor: none; }
+
+    .grain {
+      position: fixed; inset: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 100; opacity: 0.036;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain-shift .5s steps(1) infinite;
+    }
+    @keyframes grain-shift {
+      0%{transform:translate(0,0)}10%{transform:translate(-2%,-3%)}20%{transform:translate(3%,2%)}
+      30%{transform:translate(-1%,4%)}40%{transform:translate(4%,-1%)}50%{transform:translate(-3%,3%)}
+      60%{transform:translate(2%,-4%)}70%{transform:translate(-4%,1%)}80%{transform:translate(1%,-2%)}
+      90%{transform:translate(-2%,4%)}100%{transform:translate(3%,-3%)}
+    }
+
+    #progress-bar { position: fixed; right: 0; top: 0; width: 2px; height: 100vh; background: rgba(196,30,42,0.1); z-index: 90; pointer-events: none; }
+    #progress-fill { width: 100%; height: 0%; background: var(--rosso); box-shadow: 0 0 8px rgba(196,30,42,.7); }
+
+    /* Nav */
+    #main-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; padding: 1.4rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    #main-nav.scrolled { background: rgba(8,8,8,.92); backdrop-filter: blur(12px); box-shadow: 0 1px 0 rgba(196,30,42,.15); }
+    .nav-brand { font-family: 'Bebas Neue', sans-serif; font-size: 1.05rem; letter-spacing: .07em; color: var(--bianco); text-decoration: none; }
+    .nav-brand span { color: var(--rosso); }
+    .nav-link { font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: rgba(136,132,128,.4); text-decoration: none; transition: color 250ms; }
+    .nav-link:hover { color: var(--grigio); }
+
+    /* ══ MAP SCROLL — sticky approach (no GSAP pin = no flash) ══
+       #map-wrap is tall (600vh).
+       #map-hero sticks to top of viewport while wrapper scrolls.
+       ScrollTrigger reads #map-wrap progress → drives zoom.
+    */
+    #map-wrap { height: 600vh; }
+
+    #map-hero {
+      position: sticky; top: 0;
+      width: 100%; height: 100vh;
+      overflow: hidden;
+      /* Sea colour as page background */
+      background: #07101e;
+    }
+
+    /* Atmospheric WebGL tint */
+    #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+    #hero-fallback { display: none; position: absolute; inset: 0; z-index: 1; background: radial-gradient(ellipse at 40% 55%, #1a0408 0%, #07101e 70%); }
+
+    /* Map grid + Italy SVG — viewBox centred on Barbarasco (0,0) */
+    #map-bg {
+      position: absolute; inset: -40%; width: 180%; height: 180%;
+      transform-origin: center center;
+      pointer-events: none; z-index: 2;
+    }
+    .map-grid-svg { width: 100%; height: 100%; }
+
+    /* Text layers */
+    .map-layer {
+      position: absolute; inset: 0; z-index: 5;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; pointer-events: none; will-change: opacity, transform;
+    }
+
+    /* Scroll indicator */
+    #map-scroll-ind {
+      position: absolute; bottom: 1.4rem; left: 50%; transform: translateX(-50%);
+      z-index: 10; display: flex; flex-direction: column; align-items: center;
+      gap: .5rem; color: var(--grigio); font-size: .5rem;
+      letter-spacing: .24em; text-transform: uppercase;
+      opacity: 0; transition: opacity 700ms 500ms ease;
+    }
+    #map-scroll-ind.in  { opacity: 1; }
+    #map-scroll-ind.hide { opacity: 0; pointer-events: none; transition: opacity 400ms ease; }
+    .scroll-arrow { width: 1px; height: 2rem; background: linear-gradient(to bottom, var(--rosso), transparent); animation: arrow-pulse 2s ease-in-out infinite; }
+    @keyframes arrow-pulse { 0%,100%{transform:scaleY(1);opacity:.5} 50%{transform:scaleY(1.3);opacity:1} }
+
+    /* ── Layer A: Italia wide ── */
+    #ml-a { opacity: 1; }
+    .ml-a-tag { font-size: clamp(.9rem,1.6vw,1.1rem); letter-spacing: .22em; text-transform: uppercase; color: rgba(200,197,192,.55); margin-bottom: .9rem; }
+
+    .ml-a-title { display: block; max-width: 92vw; }
+
+    .ml-a-rule { width: clamp(60px,14vw,120px); height: 1px; background: var(--rosso); margin: 1rem 0; box-shadow: 0 0 8px rgba(196,30,42,.6); }
+    .ml-a-date { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.1rem,2.6vw,2.2rem); letter-spacing: .1em; color: rgba(240,237,232,.75); }
+    .ml-a-circle {
+      width: clamp(100px,15vw,190px); height: clamp(100px,15vw,190px);
+      border-radius: 50%; border: 1px solid rgba(196,30,42,.2);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      animation: pulse-ring 3.5s ease-in-out infinite;
+    }
+    .ml-a-circle::after { content:''; position:absolute; inset:-20px; border-radius:50%; border:1px solid rgba(196,30,42,.08); animation: pulse-ring 3.5s ease-in-out infinite .9s; }
+    @keyframes pulse-ring { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.45} 50%{transform:translate(-50%,-50%) scale(1.07);opacity:.9} }
+
+    /* ── Layer B: Barbarasco ── */
+    #ml-b { opacity: 0; }
+    .ml-b-tag { font-size: clamp(.9rem,1.6vw,1.1rem); letter-spacing: .22em; text-transform: uppercase; color: rgba(200,197,192,.55); margin-bottom: .8rem; }
+    .ml-b-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem,14vw,12rem); line-height: .82;
+      color: transparent; -webkit-text-stroke: 1.5px rgba(240,237,232,.6);
+      position: relative;
+      animation: b-glow 3s ease-in-out infinite;
+    }
+    @keyframes b-glow {
+      0%,100% { filter: drop-shadow(0 0 4px rgba(196,30,42,.12)); }
+      50%      { filter: drop-shadow(0 0 18px rgba(196,30,42,.55)) drop-shadow(0 0 40px rgba(196,30,42,.2)); }
+    }
+    .ml-b-title::before, .ml-b-title::after {
+      content: 'Barbarasco';
+      position: absolute; top: 0; left: 0; width: 100%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: inherit; line-height: inherit;
+      color: transparent; pointer-events: none; opacity: 0;
+    }
+    .ml-b-title::before {
+      -webkit-text-stroke: 1.5px rgba(196,30,42,.9);
+      animation: gb-red 5s infinite;
+    }
+    .ml-b-title::after {
+      -webkit-text-stroke: 1.5px rgba(80,210,255,.6);
+      animation: gb-cyan 5s .45s infinite;
+    }
+    @keyframes gb-red {
+      0%,84%,100% { transform:none; opacity:0; clip-path:none; }
+      86% { transform:translateX(-7px); opacity:1; clip-path:polygon(0 4%,100% 4%,100% 30%,0 30%); }
+      88% { transform:translateX(5px);  clip-path:polygon(0 54%,100% 54%,100% 78%,0 78%); }
+      90% { transform:translateX(-3px); clip-path:polygon(0 37%,100% 37%,100% 52%,0 52%); }
+      92% { opacity:0; }
+    }
+    @keyframes gb-cyan {
+      0%,84%,100% { transform:none; opacity:0; clip-path:none; }
+      86% { transform:translateX(6px);  opacity:1; clip-path:polygon(0 40%,100% 40%,100% 66%,0 66%); }
+      88% { transform:translateX(-5px); clip-path:polygon(0 10%,100% 10%,100% 28%,0 28%); }
+      90% { transform:translateX(3px);  clip-path:polygon(0 70%,100% 70%,100% 88%,0 88%); }
+      92% { opacity:0; }
+    }
+    .ml-b-title.glitch-burst { animation: b-glow-burst .12s ease-in-out infinite; }
+    .ml-b-title.glitch-burst::before { animation: gb-red .28s infinite; }
+    .ml-b-title.glitch-burst::after  { animation: gb-cyan .28s .06s infinite; }
+    @keyframes b-glow-burst {
+      0%,100% { filter: drop-shadow(0 0 22px rgba(196,30,42,.9)) drop-shadow(0 0 55px rgba(196,30,42,.4)); }
+      50%      { filter: drop-shadow(0 0 6px rgba(196,30,42,.25)); }
+    }
+    .ml-b-cap { font-size: clamp(.9rem,1.6vw,1.05rem); letter-spacing: .18em; text-transform: uppercase; color: rgba(200,197,192,.7); margin-top: 1rem; }
+
+    /* ── Layer C: Parco Fiera ── */
+    #ml-c { opacity: 0; }
+    .ch-h, .ch-v { position: absolute; background: rgba(196,30,42,.42); transform-origin: center; }
+    .ch-h { top: 50%; left: 0; width: 100%; height: 1px; transform: scaleX(0); }
+    .ch-v { left: 50%; top: 0; width: 1px; height: 100%; transform: scaleY(0); }
+    .ch-dot { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 10px; height: 10px; border-radius: 50%; background: var(--rosso); box-shadow: 0 0 16px rgba(196,30,42,.8), 0 0 32px rgba(196,30,42,.35); }
+    .ch-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(196,30,42,.4); }
+    .ml-c-label { position: relative; z-index: 2; margin-top: -1.5rem; font-size: clamp(.9rem,1.5vw,1.05rem); letter-spacing: .18em; text-transform: uppercase; color: rgba(200,197,192,.7); background: rgba(8,8,8,.8); padding: .3rem 1.2rem; }
+    .ml-c-venue { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem,6vw,5rem); line-height: .88; color: var(--bianco); margin-top: .3rem; position: relative; z-index: 2; }
+    .ml-c-coords { font-size: clamp(.9rem,1.5vw,1.05rem); letter-spacing: .14em; color: rgba(180,177,172,.75); margin-top: .4rem; position: relative; z-index: 2; }
+    .ml-c-date { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.2rem,2.4vw,2rem); letter-spacing: .1em; color: rgba(240,237,232,.85); margin-top: 1.1rem; position: relative; z-index: 2; }
+    .ml-c-cd { display: flex; align-items: flex-start; justify-content: center; gap: clamp(.8rem,2vw,2.4rem); margin-top: 1.3rem; position: relative; z-index: 2; }
+    .ml-cd-block { display: flex; flex-direction: column; align-items: center; }
+    .ml-cd-num { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem,5vw,4.2rem); line-height: 1; color: var(--bianco); min-width: 2ch; text-align: center; }
+    .ml-cd-unit { font-size: clamp(.75rem,1.2vw,.88rem); letter-spacing: .14em; text-transform: uppercase; color: var(--grigio); margin-top: .3rem; }
+    .ml-cd-sep { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem,5vw,4.2rem); line-height: 1; color: rgba(200,197,192,.3); user-select: none; }
+    .ml-c-entry-sep { width: 1rem; height: 1px; background: var(--piombo); }
+
+    /* ══ EVENT INFO ══ */
+    #event-info { background: var(--nero); padding: 7rem 2rem 6rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .ei-inner { width: 100%; max-width: 720px; }
+
+    .ei-tag { font-size: clamp(.9rem,1.5vw,1.05rem); letter-spacing: .18em; text-transform: uppercase; color: var(--grigio); margin-bottom: .8rem; opacity: 0; transform: translateY(12px); transition: opacity 600ms cubic-bezier(.16,1,.3,1), transform 600ms cubic-bezier(.16,1,.3,1); }
+    .ei-tag.in { opacity: 1; transform: none; }
+
+    .ei-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(6rem,20vw,18rem); line-height: .82; color: var(--bianco); display: block; opacity: 0; transform: translateY(24px); transition: opacity 900ms 80ms cubic-bezier(.16,1,.3,1), transform 900ms 80ms cubic-bezier(.16,1,.3,1); }
+    .ei-title.in { opacity: 1; transform: none; }
+
+    .ei-rule { width: clamp(160px,40vw,380px); height: 1px; background: var(--rosso); margin: 1rem auto; transform-origin: center; opacity: 0; transform: scaleX(0); transition: opacity 450ms cubic-bezier(.16,1,.3,1), transform 450ms cubic-bezier(.16,1,.3,1); }
+    .ei-rule.in { opacity: 1; transform: scaleX(1); }
+
+    .ei-desc { font-size: clamp(.72rem,1.6vw,.88rem); line-height: 1.85; color: var(--grigio); max-width: 44ch; margin: 0 auto 1.8rem; opacity: 0; transform: translateY(14px); transition: opacity 700ms 150ms cubic-bezier(.16,1,.3,1), transform 700ms 150ms cubic-bezier(.16,1,.3,1); }
+    .ei-desc.in { opacity: 1; transform: none; }
+    .ei-desc em { color: var(--bianco); font-style: normal; }
+
+    .ei-date-line { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1rem,3vw,2.4rem); letter-spacing: .1em; display: flex; align-items: baseline; gap: .45em; flex-wrap: wrap; justify-content: center; margin-bottom: .4rem; opacity: 0; transform: translateY(14px); transition: opacity 650ms 200ms cubic-bezier(.16,1,.3,1), transform 650ms 200ms cubic-bezier(.16,1,.3,1); }
+    .ei-date-line.in { opacity: 1; transform: none; }
+    .ei-date-sep { color: var(--piombo); font-size: .6em; }
+    .ei-date-accent { color: transparent; -webkit-text-stroke: 1px var(--rosso); }
+
+    .ei-lineup { width: 100%; max-width: 500px; margin: .8rem auto 0; opacity: 0; transform: translateY(14px); transition: opacity 700ms 280ms cubic-bezier(.16,1,.3,1), transform 700ms 280ms cubic-bezier(.16,1,.3,1); }
+    .ei-lineup.in { opacity: 1; transform: none; }
+    .ei-lrow { display: grid; grid-template-columns: 3.8em 1fr; align-items: baseline; gap: 1rem; padding: clamp(.28rem,.65vh,.5rem) 0; border-top: 1px solid rgba(240,237,232,.05); }
+    .ei-lrow:last-child { border-bottom: 1px solid rgba(240,237,232,.05); }
+    .ei-ltime { font-size: clamp(.9rem,1.4vw,1rem); letter-spacing: .1em; color: rgba(200,197,192,.55); text-align: right; }
+    .ei-lname { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.1rem,3vw,2.6rem); line-height: 1; color: var(--bianco); letter-spacing: .02em; text-align: left; }
+
+    .ei-venue { font-size: clamp(.9rem,1.5vw,1.05rem); letter-spacing: .16em; text-transform: uppercase; color: var(--grigio); margin-top: .5rem; opacity: 0; transform: translateY(10px); transition: opacity 550ms 350ms cubic-bezier(.16,1,.3,1), transform 550ms 350ms cubic-bezier(.16,1,.3,1); }
+    .ei-venue.in { opacity: 1; transform: none; }
+
+    .ei-entry { font-size: clamp(.64rem,.95vw,.76rem); letter-spacing: .14em; text-transform: uppercase; color: rgba(136,132,128,.65); margin-top: .3rem; opacity: 0; transition: opacity 550ms 420ms cubic-bezier(.16,1,.3,1); }
+    .ei-entry.in { opacity: 1; }
+
+    .ei-inspired { font-size: .58rem; letter-spacing: .06em; font-style: italic; color: rgba(136,132,128,.26); margin-top: 2.5rem; opacity: 0; transition: opacity 700ms 480ms ease; }
+    .ei-inspired.in { opacity: 1; }
+
+    /* Footer */
+    #loc-footer { background: var(--nero); padding: 4.5rem 1.5rem 3rem; text-align: center; border-top: 1px solid var(--piombo); }
+    .lf-logo { margin: 0 auto 1.8rem; width: 65px; }
+    .lf-name { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: .08em; color: var(--bianco); margin-bottom: .3rem; }
+    .lf-sub { font-size: .57rem; letter-spacing: .16em; text-transform: uppercase; color: var(--grigio); }
+    .lf-rule { width: 1px; height: 2.5rem; background: var(--piombo); margin: 1.8rem auto; }
+    .lf-ig { display: inline-flex; align-items: center; gap: .5rem; font-size: .57rem; letter-spacing: .18em; text-transform: uppercase; color: var(--grigio); text-decoration: none; transition: color 200ms; }
+    .lf-ig:hover { color: var(--bianco); }
+    .lf-copy { font-size: .51rem; color: var(--piombo); letter-spacing: .1em; margin-top: 1.5rem; }
+
+    /* ── CUSTOM CURSOR ── */
+    #cur-dot {
+      position: fixed; width: 7px; height: 7px;
+      background: var(--rosso); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .15s, height .15s;
+    }
+    #cur-ring {
+      position: fixed; width: 40px; height: 40px;
+      border: 1px solid rgba(196,30,42,.5); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width .35s cubic-bezier(.16,1,.3,1),
+                  height .35s cubic-bezier(.16,1,.3,1),
+                  border-color .3s;
+    }
+    body.cur-hover #cur-dot  { width: 11px; height: 11px; }
+    body.cur-hover #cur-ring { width: 60px; height: 60px; border-color: rgba(196,30,42,.22); }
+
+    /* ── MARQUEE ── */
+    #marquee-wrap {
+      overflow: hidden; padding: 1rem 0;
+      border-top: 1px solid rgba(196,30,42,.1);
+      border-bottom: 1px solid rgba(196,30,42,.1);
+      background: rgba(196,30,42,.02);
+    }
+    .marquee-track {
+      display: flex; gap: 3rem; align-items: baseline;
+      animation: marquee-scroll 28s linear infinite;
+      width: max-content;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .mq-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(.9rem,2vw,1.5rem); letter-spacing: .06em;
+      color: rgba(240,237,232,.18); flex-shrink: 0; white-space: nowrap;
+    }
+    .mq-item.mq-red { color: rgba(196,30,42,.6); font-size: .65em; }
+
+    /* ── STANDALONE COUNTDOWN ── */
+    #cd-section {
+      padding: clamp(5rem,11vh,9rem) 2rem;
+      display: flex; flex-direction: column; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    #cd-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(90deg,transparent 25%,rgba(196,30,42,.012) 25.5%,transparent 26%),
+        linear-gradient(90deg,transparent 50%,rgba(196,30,42,.012) 50.5%,transparent 51%),
+        linear-gradient(90deg,transparent 75%,rgba(196,30,42,.012) 75.5%,transparent 76%);
+      pointer-events: none;
+    }
+    .cd-eyebrow {
+      font-size: .55rem; letter-spacing: .3em; text-transform: uppercase;
+      color: rgba(136,132,128,.4); margin-bottom: 3.5rem;
+    }
+    .cd-grid {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: clamp(.5rem,3vw,3rem); width: 100%; max-width: 1000px;
+    }
+    @media (max-width: 600px) { .cd-grid { grid-template-columns: repeat(2,1fr); } }
+    .cd-block {
+      text-align: center; position: relative;
+    }
+    .cd-block::before {
+      content: ''; position: absolute; inset: 0;
+      border: 1px solid rgba(196,30,42,.08); pointer-events: none;
+    }
+    .cd-block::after {
+      content: ''; position: absolute;
+      top: -1px; left: 20%; right: 20%; height: 1px;
+      background: var(--rosso); box-shadow: 0 0 8px rgba(196,30,42,.7);
+    }
+    .cd-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem,10vw,10rem);
+      line-height: 1; color: var(--bianco);
+      padding: clamp(1rem,3vh,2rem) clamp(.5rem,2vw,1.5rem) 0;
+      display: block; letter-spacing: -.01em;
+      font-variant-numeric: tabular-nums;
+    }
+    .cd-unit {
+      display: block;
+      font-size: clamp(.48rem,.85vw,.58rem); letter-spacing: .22em; text-transform: uppercase;
+      color: var(--grigio); padding-bottom: clamp(.8rem,2vh,1.5rem); margin-top: .3rem;
+    }
+
+    /* ── LED WALL ── */
+    #event-info { position: relative; overflow: hidden; }
+    #led-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+    .ei-inner { position: relative; z-index: 1; }
+
+    /* ── LINEUP HOVER GLOW ── */
+    .ei-lrow { transition: background 350ms cubic-bezier(.16,1,.3,1); }
+    .ei-lrow:hover { background: rgba(196,30,42,.04); }
+    .ei-lrow:hover .ei-lname {
+      color: var(--bianco);
+      text-shadow: 0 0 18px rgba(196,30,42,.45), 0 0 40px rgba(196,30,42,.18);
+    }
+    .ei-lrow:hover .ei-ltime { color: rgba(196,30,42,.6); }
+    .ei-lname { transition: color 300ms, text-shadow 300ms; }
+    .ei-ltime { transition: color 300ms; }
+  </style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div id="progress-bar" aria-hidden="true"><div id="progress-fill"></div></div>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<nav id="main-nav">
+  <a href="#" class="nav-brand">Barbarasco <span>54012</span></a>
+  <a href="chi-siamo.html" class="nav-link">Chi siamo →</a>
+</nav>
+
+<!--
+  MAP WRAP — tall scroll container (600vh).
+  #map-hero sticks to top via CSS position:sticky.
+  No GSAP pin → no flash/double-render.
+-->
+<div id="map-wrap">
+<section id="map-hero">
+
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div id="hero-fallback" aria-hidden="true"></div>
+
+  <!--
+    ITALY SVG coordinate system
+    Origin = Barbarasco (44.06°N, 10.10°E) → SVG (0,0)
+    x = (lon − 10.10) × 25
+    y = −(lat − 44.06) × 35
+    viewBox centred on (0,0) so CSS scale() zooms toward Barbarasco.
+  -->
+  <div id="map-bg" aria-hidden="true">
+    <svg class="map-grid-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="grid-sm" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(196,30,42,0.06)" stroke-width="0.5"/>
+        </pattern>
+        <pattern id="grid-lg" x="0" y="0" width="180" height="180" patternUnits="userSpaceOnUse">
+          <rect width="180" height="180" fill="url(#grid-sm)"/>
+          <path d="M 180 0 L 0 0 0 180" fill="none" stroke="rgba(196,30,42,0.11)" stroke-width="1"/>
+        </pattern>
+      </defs>
+
+      <!-- Grid overlay -->
+      <rect width="100%" height="100%" fill="url(#grid-lg)"/>
+
+      <!-- Italy SVG — centred viewBox on Barbarasco (0,0) -->
+      <svg x="0" y="0" width="100%" height="100%"
+           viewBox="-220 -275 440 550"
+           preserveAspectRatio="xMidYMid meet">
+
+        <!-- Continental Italy -->
+        <path d="
+          M -68,10 L -58,9 L -40,-8 L -29,-12
+          L -7,-1 L 0,0 L 4,4 L 6,18
+          L 11,40 L 16,44 L 28,59
+          L 42,69 L 53,80 L 63,91
+          L 87,100 L 98,113 L 106,122 L 122,129
+          L 144,165 L 144,200 L 139,209
+          L 154,204 L 176,174
+          L 195,140 L 210,137 L 207,149 L 197,141
+          L 179,126 L 169,103 L 152,75 L 145,85
+          L 103,56 L 85,15 L 62,0
+          L 56,-48 L 92,-56 L 85,-70
+          L 35,-102 L 10,-99 L -38,-68 L -77,-62 L -64,-12 L -68,10 Z"
+          fill="rgba(196,30,42,0.04)" stroke="rgba(196,30,42,0.30)" stroke-width="0.8" stroke-linejoin="round"/>
+
+        <!-- Sardinia -->
+        <path d="M -47,108 L -15,111 L -12,143 L -15,174 L -37,183 L -49,177 L -45,122 Z"
+          fill="rgba(196,30,42,0.04)" stroke="rgba(196,30,42,0.22)" stroke-width="0.7"/>
+
+        <!-- Sicily -->
+        <path d="M 61,211 L 82,209 L 128,204 L 136,206 L 130,218 L 111,259 L 87,235 L 61,211 Z"
+          fill="rgba(196,30,42,0.04)" stroke="rgba(196,30,42,0.22)" stroke-width="0.7"/>
+
+        <!-- City dots -->
+        <g fill="rgba(240,237,232,0.25)">
+          <circle cx="-23" cy="-49" r="2"/>
+          <circle cx="31"  cy="-15" r="1.6"/>
+          <circle cx="56"  cy="-48" r="1.6"/>
+          <circle cx="-29" cy="-12" r="1.6"/>
+          <circle cx="29"  cy="10"  r="1.6"/>
+          <circle cx="60"  cy="75"  r="2"/>
+          <circle cx="104" cy="112" r="1.6"/>
+          <circle cx="-61" cy="-35" r="1.6"/>
+        </g>
+
+        <!-- City labels -->
+        <g fill="rgba(240,237,232,0.28)" font-family="'DM Sans',sans-serif" font-size="4" letter-spacing="0.3">
+          <text x="-21" y="-52">Milano</text>
+          <text x="33"  y="-17">Bologna</text>
+          <text x="58"  y="-51">Venezia</text>
+          <text x="-27" y="-15">Genova</text>
+          <text x="31"  y="8">Firenze</text>
+          <text x="62"  y="73">Roma</text>
+          <text x="106" y="110">Napoli</text>
+          <text x="-59" y="-38">Torino</text>
+        </g>
+
+        <!-- Barbarasco marker + label -->
+        <circle cx="0" cy="0" r="3"  fill="#C41E2A" opacity="0.95"/>
+        <circle cx="0" cy="0" r="8"  fill="none" stroke="rgba(196,30,42,0.5)"  stroke-width="0.8"/>
+        <circle cx="0" cy="0" r="20" fill="none" stroke="rgba(196,30,42,0.18)" stroke-width="0.5"/>
+        <text x="4.5" y="-5.5" fill="rgba(196,30,42,0.85)" font-family="'DM Sans',sans-serif" font-size="4.5" letter-spacing="0.2">Barbarasco</text>
+
+        <!-- Parco Fiera area marker -->
+        <rect x="-3.5" y="-3.5" width="7" height="7"
+          fill="rgba(196,30,42,0.08)" stroke="rgba(196,30,42,0.35)" stroke-width="0.5"/>
+
+      </svg>
+
+      <!-- Concentric target rings around Barbarasco (screen-space) -->
+      <circle cx="50%" cy="50%" r="6%"  fill="none" stroke="rgba(196,30,42,0.09)" stroke-width="0.8"/>
+      <circle cx="50%" cy="50%" r="12%" fill="none" stroke="rgba(196,30,42,0.06)" stroke-width="0.6"/>
+      <circle cx="50%" cy="50%" r="20%" fill="none" stroke="rgba(196,30,42,0.04)" stroke-width="0.4"/>
+    </svg>
+  </div>
+
+  <!-- Layer A: Italia wide — LOCURA intro -->
+  <div class="map-layer" id="ml-a">
+    <div class="ml-a-circle"></div>
+    <div class="ml-a-tag">Pro Loco Barbarasco 54012</div>
+    <canvas id="locura-led" class="ml-a-title" aria-label="LOCURA"></canvas>
+    <div class="ml-a-rule"></div>
+    <div class="ml-a-date">11 Luglio 2026 &nbsp;·&nbsp; Barbarasco</div>
+  </div>
+
+  <!-- Layer B: Barbarasco zoomed -->
+  <div class="map-layer" id="ml-b">
+    <div class="ml-b-tag">Lunigiana · 54012</div>
+    <div class="ml-b-title">Barbarasco</div>
+    <div class="ml-b-cap">44°03′N &nbsp;·&nbsp; 10°05′E</div>
+  </div>
+
+  <!-- Layer C: Parco Fiera / crosshair -->
+  <div class="map-layer" id="ml-c">
+    <div class="ch-h" id="ch-h"></div>
+    <div class="ch-v" id="ch-v"></div>
+    <div class="ch-ring"></div>
+    <div class="ch-dot"></div>
+    <div class="ml-c-label">— Parco Fiera —</div>
+    <div class="ml-c-venue">11.07.2026</div>
+    <div class="ml-c-coords">44°03′26″N &nbsp; 10°05′52″E</div>
+    <div class="ml-c-date">Ore 18:00</div>
+  </div>
+
+  <div id="map-scroll-ind">
+    <div class="scroll-arrow"></div>
+    <span>Scorri</span>
+  </div>
+
+</section>
+</div><!-- /map-wrap -->
+
+<!-- ══ MARQUEE ══ -->
+<div id="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">LOCURA</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">11 Luglio 2026</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Barbarasco 54012</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Techno</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Tech House</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Parco Fiera</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Ore 18:00</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Lunigiana</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Ingresso Libero</span>
+    <span class="mq-item mq-red">✦</span>
+    <!-- duplicate for seamless loop -->
+    <span class="mq-item">LOCURA</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">11 Luglio 2026</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Barbarasco 54012</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Techno</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Tech House</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Parco Fiera</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Ore 18:00</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Lunigiana</span>
+    <span class="mq-item mq-red">✦</span>
+    <span class="mq-item">Ingresso Libero</span>
+    <span class="mq-item mq-red">✦</span>
+  </div>
+</div>
+
+<!-- ══ COUNTDOWN ══ -->
+<section id="cd-section">
+  <div class="cd-eyebrow">L'evento inizia tra</div>
+  <div class="cd-grid">
+    <div class="cd-block"><span class="cd-num" id="lcd-days">--</span><span class="cd-unit">Giorni</span></div>
+    <div class="cd-block"><span class="cd-num" id="lcd-hours">--</span><span class="cd-unit">Ore</span></div>
+    <div class="cd-block"><span class="cd-num" id="lcd-mins">--</span><span class="cd-unit">Minuti</span></div>
+    <div class="cd-block"><span class="cd-num" id="lcd-secs">--</span><span class="cd-unit">Secondi</span></div>
+  </div>
+</section>
+
+<!-- ══ EVENT INFO ══ -->
+<section id="event-info">
+  <canvas id="led-canvas" aria-hidden="true"></canvas>
+  <div class="ei-inner">
+    <div class="ei-tag reveal-ei">Pro Loco Barbarasco 54012 · Presenta</div>
+    <span class="ei-title reveal-ei">Locura</span>
+    <div class="ei-rule reveal-ei"></div>
+    <p class="ei-desc reveal-ei">
+      Un <em>rave open air</em> nel Parco Fiera di Barbarasco.<br>
+      Una notte intera di techno e tech house,<br>
+      ispirata a Circoloco e ai grandi festival europei.
+    </p>
+    <div class="ei-date-line reveal-ei">
+      <span style="color:var(--bianco)">Sabato</span>
+      <span class="ei-date-sep">/</span>
+      <span class="ei-date-accent">11 Luglio</span>
+      <span class="ei-date-sep">/</span>
+      <span style="color:var(--bianco)">2026</span>
+    </div>
+    <div class="ei-rule reveal-ei" style="margin-top:.5rem;"></div>
+    <div class="ei-lineup reveal-ei">
+      <div class="ei-lrow"><span class="ei-ltime">22:00</span><span class="ei-lname">Selezione Tech House</span></div>
+      <div class="ei-lrow"><span class="ei-ltime">23:00</span><span class="ei-lname">DJ Nash</span></div>
+      <div class="ei-lrow"><span class="ei-ltime">01:00</span><span class="ei-lname">Technobrother</span></div>
+      <div class="ei-lrow"><span class="ei-ltime">02:00</span><span class="ei-lname">Blace</span></div>
+    </div>
+    <div class="ei-rule reveal-ei" style="margin-bottom:.6rem;"></div>
+    <span class="ei-venue reveal-ei">Parco Fiera di Barbarasco · Ore 18:00</span>
+    <span class="ei-inspired reveal-ei">Inspired by Circoloco</span>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer id="loc-footer">
+  <div class="lf-logo">
+    <div style="position:relative;display:inline-block;">
+      <svg viewBox="0 0 320 210" width="65" height="43" fill="none" xmlns="http://www.w3.org/2000/svg" color="#F0EDE8">
+        <defs><clipPath id="lf-go"><ellipse cx="160" cy="105" rx="144" ry="90"/></clipPath></defs>
+        <ellipse cx="160" cy="105" rx="158" ry="101" stroke="currentColor" stroke-width="5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="148" ry="94" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="144" ry="90" fill="#0a0a0a"/>
+        <g clip-path="url(#lf-go)" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.45">
+          <ellipse cx="160" cy="105" rx="144" ry="18"/><ellipse cx="160" cy="105" rx="144" ry="40"/>
+          <ellipse cx="160" cy="105" rx="144" ry="62"/><ellipse cx="160" cy="105" rx="114" ry="90"/>
+        </g>
+        <line x1="160" y1="0" x2="160" y2="210" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="105" x2="320" y2="105" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="16" y="65" width="288" height="80" fill="#080808"/>
+        <line x1="16" y1="65" x2="304" y2="65" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="16" y1="145" x2="304" y2="145" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',Impact,sans-serif;font-style:italic;font-size:.72rem;color:#F0EDE8;white-space:nowrap;pointer-events:none;">54012</span>
+    </div>
+  </div>
+  <div class="lf-name">Pro Loco Barbarasco 54012</div>
+  <div class="lf-sub">Barbarasco, Massa-Carrara — Toscana</div>
+  <div class="lf-rule"></div>
+  <a href="https://www.instagram.com/barbarasco54012/" target="_blank" rel="noopener" class="lf-ig">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+    </svg>
+    @barbarasco54012
+  </a>
+  <div class="lf-copy">© 2026 Pro Loco Barbarasco 54012 — Tutti i diritti riservati</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<script>
+(function () {
+  'use strict';
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Progress bar
+  var pFill = document.getElementById('progress-fill');
+  window.addEventListener('scroll', function () {
+    if (pFill) pFill.style.height = Math.min(window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100, 100) + '%';
+  }, { passive: true });
+
+  // Custom cursor
+  var curDot  = document.getElementById('cur-dot');
+  var curRing = document.getElementById('cur-ring');
+  var cmx = -200, cmy = -200, crx = -200, cry = -200;
+  document.addEventListener('mousemove', function (e) {
+    cmx = e.clientX; cmy = e.clientY;
+    curDot.style.left = cmx + 'px';
+    curDot.style.top  = cmy + 'px';
+  }, { passive: true });
+  (function ringTick() {
+    crx += (cmx - crx) * 0.12;
+    cry += (cmy - cry) * 0.12;
+    curRing.style.left = crx + 'px';
+    curRing.style.top  = cry + 'px';
+    requestAnimationFrame(ringTick);
+  })();
+  document.querySelectorAll('a, button').forEach(function (el) {
+    el.addEventListener('mouseenter', function () { document.body.classList.add('cur-hover'); });
+    el.addEventListener('mouseleave', function () { document.body.classList.remove('cur-hover'); });
+  });
+
+  // Page load
+  window.addEventListener('load', function () {
+    document.documentElement.style.opacity = '1';
+    setTimeout(function () {
+      var ind = document.getElementById('map-scroll-ind');
+      if (ind) ind.classList.add('in');
+    }, 500);
+  });
+
+  // Scroll indicator & nav
+  var scrollInd = document.getElementById('map-scroll-ind');
+  var mainNav   = document.getElementById('main-nav');
+  window.addEventListener('scroll', function () {
+    if (scrollInd) scrollInd.classList.toggle('hide', window.scrollY > 80);
+    if (mainNav)   mainNav.classList.toggle('scrolled', window.scrollY > window.innerHeight * 0.4);
+  }, { passive: true });
+
+  // WebGL atmospheric background
+  var isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) || window.innerWidth < 768;
+  var heroCanvas   = document.getElementById('hero-canvas');
+  var heroFallback = document.getElementById('hero-fallback');
+  var heroMat = null;
+
+  if (isMobile || typeof THREE === 'undefined') {
+    heroCanvas.style.display = 'none'; heroFallback.style.display = 'block';
+  } else {
+    try {
+      var hR = new THREE.WebGLRenderer({ canvas: heroCanvas, alpha: false, antialias: false });
+      hR.setSize(window.innerWidth, window.innerHeight);
+      hR.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      var hScene = new THREE.Scene();
+      var hCam   = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      heroMat = new THREE.ShaderMaterial({
+        uniforms: { uTime: { value: 0 }, uProg: { value: 0 } },
+        vertexShader: 'varying vec2 vUv; void main(){vUv=uv;gl_Position=vec4(position,1.);}',
+        fragmentShader: [
+          'precision mediump float;',
+          'uniform float uTime,uProg; varying vec2 vUv;',
+          'float h(vec2 p){p=fract(p*vec2(234.34,435.345));p+=dot(p,p+34.23);return fract(p.x*p.y);}',
+          'float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);',
+          'return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}',
+          'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p=p*2.1+vec2(1.7,9.2);a*=.5;}return v;}',
+          'void main(){',
+          /* subtle blue-tinted sea atmosphere */
+          'vec2 q=vec2(fbm(vUv*3.+uTime*.04),fbm(vUv*3.+vec2(1.3,.7)+uTime*.036));',
+          'float f=fbm(vUv*2.5+q+uTime*.03);',
+          /* base: very dark blue-sea tone */
+          'vec3 sea=vec3(.028,.062,.110),land=vec3(.08,.05,.02);',
+          'vec3 col=mix(sea,land,smoothstep(.3,.65,f));',
+          /* reddish bloom as zoom progresses */
+          'col.r+=uProg*.10; col.b*=(1.-uProg*.3);',
+          'float vig=1.-smoothstep(.1,.9,length(vUv-.5)*1.45);',
+          'col*=vig;',
+          'gl_FragColor=vec4(col,1.);}',
+        ].join('\n'),
+      });
+      hScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), heroMat));
+      window.addEventListener('resize', function () { hR.setSize(window.innerWidth, window.innerHeight); }, { passive: true });
+      (function loop(t) {
+        requestAnimationFrame(loop);
+        if (document.visibilityState !== 'visible') return;
+        heroMat.uniforms.uTime.value = t * .001;
+        hR.render(hScene, hCam);
+      })(0);
+    } catch(e) { heroCanvas.style.display='none'; heroFallback.style.display='block'; }
+  }
+
+  // ── MAP ZOOM ─────────────────────────────────────────────────────────
+  // Driven by #map-wrap scroll (600vh), NOT by GSAP pin.
+  // CSS position:sticky handles the visual pinning — zero flash.
+
+  var mlA = document.getElementById('ml-a');
+  var mlB = document.getElementById('ml-b');
+  var mlC = document.getElementById('ml-c');
+  var chH = document.getElementById('ch-h');
+  var chV = document.getElementById('ch-v');
+  var mapBg = document.getElementById('map-bg');
+
+  function ss(lo, hi, x) {
+    var t = Math.max(0, Math.min(1, (x - lo) / (hi - lo)));
+    return t * t * (3 - 2 * t);
+  }
+
+  var maxScale = isMobile ? 3 : 6;
+
+  ScrollTrigger.create({
+    trigger: '#map-wrap',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 1,
+    onUpdate: function (self) {
+      var p = self.progress;
+
+      // Smooth (smoothstep) zoom toward Barbarasco at (0,0) = viewport center
+      var ease = p * p * (3 - 2 * p);
+      mapBg.style.transform = 'scale(' + (1 + (maxScale - 1) * ease) + ') rotate(' + (p * 1.8) + 'deg)';
+
+      // Feed progress to WebGL for atmosphere shift
+      if (heroMat) heroMat.uniforms.uProg.value = p;
+
+      // Layer A: full Italy view → fades out 0.30→0.44
+      var aOut = 1 - ss(0.30, 0.44, p);
+      mlA.style.opacity  = aOut;
+      mlA.style.transform = 'scale(' + (1 - (1 - aOut) * 0.04) + ')';
+
+      // Layer B: Barbarasco name → in 0.30→0.44, out 0.64→0.78
+      var bIn  = ss(0.30, 0.44, p);
+      var bOut = 1 - ss(0.64, 0.78, p);
+      mlB.style.opacity   = bIn * bOut;
+      mlB.style.transform = 'translateY(' + ((1 - bIn) * 14) + 'px) scale(' + (1 - (1 - bOut) * 0.04) + ')';
+
+      // Layer C: Parco Fiera → in 0.66→0.80
+      var cOp = ss(0.66, 0.80, p);
+      mlC.style.opacity   = cOp;
+      mlC.style.transform = 'translateY(' + ((1 - cOp) * 14) + 'px)';
+
+      // Crosshair snaps fast 0.66→0.72
+      var chP = ss(0.66, 0.72, p);
+      if (chH) chH.style.transform = 'scaleX(' + chP + ')';
+      if (chV) chV.style.transform = 'scaleY(' + chP + ')';
+    }
+  });
+
+  // ── Event info IntersectionObserver ──────────────────────────────────
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal-ei').forEach(function (el) { obs.observe(el); });
+
+  // ── Countdown ────────────────────────────────────────────────────────
+  var cdTarget = new Date('2026-07-11T18:00:00');
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function tick() {
+    var d = cdTarget - new Date();
+    if (d <= 0) return;
+    var ed = document.getElementById('lcd-days'),
+        eh = document.getElementById('lcd-hours'),
+        em = document.getElementById('lcd-mins'),
+        es = document.getElementById('lcd-secs');
+    if (ed) ed.textContent = pad(Math.floor(d / 86400000));
+    if (eh) eh.textContent = pad(Math.floor((d % 86400000) / 3600000));
+    if (em) em.textContent = pad(Math.floor((d % 3600000) / 60000));
+    if (es) es.textContent = pad(Math.floor((d % 60000) / 1000));
+  }
+  setInterval(tick, 1000); tick();
+
+  // Glitch burst su "Barbarasco" (Layer B)
+  (function glitchLoop() {
+    var el = document.querySelector('.ml-b-title');
+    if (!el) return;
+    el.classList.add('glitch-burst');
+    setTimeout(function () { el.classList.remove('glitch-burst'); }, 300 + Math.random() * 450);
+    setTimeout(glitchLoop, 4500 + Math.random() * 8000);
+  })();
+
+  // ── LED WALL ─────────────────────────────────────────────────────────
+  window.addEventListener('load', function () {
+    var ledCanvas = document.getElementById('led-canvas');
+    var lower     = document.getElementById('event-info');
+    if (!ledCanvas || !lower) return;
+
+    var ctx2  = ledCanvas.getContext('2d');
+    var isMob = window.innerWidth < 768;
+    var CELL  = isMob ? 14 : 20;
+    var DOT   = isMob ? 1.8 : 2.5;
+    var BLUR  = isMob ? 5 : 10;
+    var cols, rows, leds2, raf2, active = false;
+
+    function resize() {
+      var w = lower.offsetWidth;
+      var h = lower.offsetHeight;
+      ledCanvas.width  = w;
+      ledCanvas.height = h;
+      cols  = Math.ceil(w / CELL) + 1;
+      rows  = Math.ceil(h / CELL) + 1;
+      leds2 = [];
+      for (var r = 0; r < rows; r++)
+        for (var c = 0; c < cols; c++)
+          leds2.push({ x: c * CELL + CELL / 2, y: r * CELL + CELL / 2, b: 0, r: r, c: c });
+    }
+
+    function render() {
+      ctx2.clearRect(0, 0, ledCanvas.width, ledCanvas.height);
+
+      /* Pass 1 — dim dots (no shadow, batch all together) */
+      ctx2.shadowBlur = 0;
+      ctx2.fillStyle  = 'rgba(18,4,6,0.22)';
+      ctx2.beginPath();
+      for (var i = 0; i < leds2.length; i++) {
+        var led = leds2[i];
+        led.b *= 0.87;
+        if (led.b < 0.01) led.b = 0;
+        if (!led.b) {
+          ctx2.arc(led.x, led.y, DOT * 0.55, 0, Math.PI * 2);
+          ctx2.moveTo(led.x + DOT * 0.55, led.y);
+        }
+      }
+      ctx2.fill();
+
+      /* Pass 2 — bright LEDs: one shadowBlur set, then batch by brightness tier */
+      ctx2.shadowColor = '#C41E2A';
+      ctx2.shadowBlur  = BLUR;
+      for (var j = 0; j < leds2.length; j++) {
+        var l = leds2[j];
+        if (!l.b) continue;
+        ctx2.globalAlpha = l.b;
+        ctx2.fillStyle   = '#C41E2A';
+        ctx2.beginPath();
+        ctx2.arc(l.x, l.y, DOT * (0.65 + 0.35 * l.b), 0, Math.PI * 2);
+        ctx2.fill();
+      }
+      ctx2.globalAlpha = 1;
+      ctx2.shadowBlur  = 0;
+
+      if (active) raf2 = requestAnimationFrame(render);
+    }
+
+    function ledAt(r, c) {
+      if (r < 0 || r >= rows || c < 0 || c >= cols) return null;
+      return leds2[r * cols + c];
+    }
+
+    /* ── PATTERNS ── */
+    function patternSweepH() {
+      for (var c = 0; c < cols; c++) {
+        (function(col) {
+          setTimeout(function() {
+            for (var r2 = 0; r2 < rows; r2++) {
+              var led = ledAt(r2, col);
+              if (led) led.b = 0.55 + Math.random() * 0.45;
+            }
+          }, col * 38);
+        })(c);
+      }
+    }
+
+    function patternScatter() {
+      var n = 40 + Math.floor(Math.random() * 40);
+      for (var i = 0; i < n; i++) {
+        var led = leds2[Math.floor(Math.random() * leds2.length)];
+        if (led) led.b = 0.6 + Math.random() * 0.4;
+      }
+    }
+
+    function patternBurst() {
+      var cr = Math.floor(Math.random() * rows);
+      var cc = Math.floor(Math.random() * cols);
+      var maxR = Math.max(rows, cols);
+      for (var ring = 0; ring < maxR; ring++) {
+        (function(ri) {
+          setTimeout(function() {
+            for (var dr = -ri; dr <= ri; dr++) {
+              for (var dc = -ri; dc <= ri; dc++) {
+                if (Math.round(Math.sqrt(dr*dr + dc*dc)) === ri) {
+                  var l = ledAt(cr + dr, cc + dc);
+                  if (l) l.b = 0.7 + Math.random() * 0.3;
+                }
+              }
+            }
+          }, ri * 35);
+        })(ring);
+      }
+    }
+
+    function patternRain() {
+      var numCols = Math.floor(cols * 0.3) + 2;
+      for (var i = 0; i < numCols; i++) {
+        var c = Math.floor(Math.random() * cols);
+        (function(col) {
+          for (var r2 = 0; r2 < rows; r2++) {
+            (function(row) {
+              setTimeout(function() {
+                var l = ledAt(row, col);
+                if (l) l.b = 0.65 + Math.random() * 0.35;
+              }, row * 45 + Math.random() * 80);
+            })(r2);
+          }
+        })(c);
+      }
+    }
+
+    var patterns = [patternSweepH, patternScatter, patternBurst, patternRain];
+    var lastPat  = -1;
+    function firePattern() {
+      var idx;
+      do { idx = Math.floor(Math.random() * patterns.length); } while (idx === lastPat);
+      lastPat = idx;
+      patterns[idx]();
+      setTimeout(firePattern, 2500 + Math.random() * 3500);
+    }
+
+    /* Start/stop on viewport intersection */
+    var observer2 = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && !active) {
+          active = true;
+          raf2 = requestAnimationFrame(render);
+        } else if (!e.isIntersecting && active) {
+          active = false;
+          cancelAnimationFrame(raf2);
+        }
+      });
+    }, { threshold: 0.01 });
+    observer2.observe(lower);
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 200);
+    }, { passive: true });
+
+    resize();
+    setTimeout(firePattern, 600);
+  });
+
+}());
+</script>
+<script>
+(function () {
+  var canvas = document.getElementById('locura-led');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var FONT = {
+    L: ['1000000','1000000','1000000','1000000','1000000','1000000','1000000','1000000','1111111'],
+    O: ['0111110','1000001','1000001','1000001','1000001','1000001','1000001','1000001','0111110'],
+    C: ['0111110','1000001','1000000','1000000','1000000','1000000','1000000','1000001','0111110'],
+    U: ['1000001','1000001','1000001','1000001','1000001','1000001','1000001','1000001','0111110'],
+    R: ['1111110','1000001','1000001','1000001','1111110','1001000','1000100','1000010','1000001'],
+    A: ['0011100','0100010','1000001','1000001','1111111','1000001','1000001','1000001','1000001'],
+  };
+  var TEXT = 'LOCURA', COLS = 7, ROWS = 9, CHAR_GAP = 2;
+  var leds = [], dpr = 1;
+
+  function buildLEDs(gap) {
+    leds = [];
+    var charW = COLS * gap, gapPx = CHAR_GAP * gap;
+    var totalW = TEXT.length * charW + (TEXT.length - 1) * gapPx;
+    var ox = (canvas.width / dpr - totalW) / 2;
+    var oy = (canvas.height / dpr - ROWS * gap) / 2;
+    var r = gap * 0.32;
+    for (var ci = 0; ci < TEXT.length; ci++) {
+      var rows = FONT[TEXT[ci]], cx = ox + ci * (charW + gapPx);
+      for (var row = 0; row < ROWS; row++)
+        for (var col = 0; col < COLS; col++) {
+          var lit = rows[row][col] === '1';
+          leds.push({ x: cx + col * gap + gap / 2, y: oy + row * gap + gap / 2, r: r, base: lit, on: lit });
+        }
+    }
+  }
+
+  function drawLED(led) {
+    var x = led.x, y = led.y, r = led.r;
+    if (led.base && led.on) {
+      var g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
+      g.addColorStop(0,   'rgba(255,210,190,1)');
+      g.addColorStop(0.25,'rgba(255,75,45,0.95)');
+      g.addColorStop(0.55,'rgba(190,20,20,0.35)');
+      g.addColorStop(1,   'rgba(160,10,10,0)');
+      ctx.beginPath(); ctx.arc(x, y, r * 3, 0, Math.PI * 2); ctx.fillStyle = g; ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,190,170,1)'; ctx.fill();
+    } else if (led.base) {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(90,12,8,0.8)'; ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(x, y, r * 0.55, 0, Math.PI * 2); ctx.fillStyle = 'rgba(30,6,4,0.35)'; ctx.fill();
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = 0; i < leds.length; i++) drawLED(leds[i]);
+  }
+
+  function scheduleFlicker() { setTimeout(doFlicker, 1400 + Math.random() * 2200); }
+
+  function doFlicker() {
+    var active = leds.filter(function(l){ return l.base; });
+    if (!active.length) { scheduleFlicker(); return; }
+    var targets, roll = Math.random();
+    if (roll < 0.45) {
+      var n = Math.ceil(active.length * (0.08 + Math.random() * 0.22));
+      targets = active.slice().sort(function(){ return Math.random() - .5; }).slice(0, n);
+    } else if (roll < 0.78) {
+      var ci = Math.floor(Math.random() * TEXT.length), off = ci * COLS * ROWS;
+      targets = leds.slice(off, off + COLS * ROWS).filter(function(l){ return l.base; });
+    } else { targets = active; }
+    var seq = [
+      {t:0,s:false},{t:55+Math.random()*90,s:true},{t:30+Math.random()*55,s:false},
+      {t:18+Math.random()*35,s:true},{t:45+Math.random()*80,s:false},{t:12+Math.random()*25,s:true}
+    ];
+    var cum = 0;
+    seq.forEach(function(step) {
+      cum += step.t; var state = step.s;
+      setTimeout(function() { targets.forEach(function(l){ l.on = state; }); draw(); }, cum);
+    });
+    scheduleFlicker();
+  }
+
+  function init() {
+    dpr = window.devicePixelRatio || 1;
+    var vw = Math.min(window.innerWidth * 0.92, 920);
+    var gap = Math.max(7, Math.floor(vw / 52));
+    var totalW = TEXT.length * COLS * gap + (TEXT.length - 1) * CHAR_GAP * gap;
+    var padX = gap * 2, padY = gap * 2;
+    canvas.style.width  = (totalW + padX * 2) + 'px';
+    canvas.style.height = (ROWS * gap + padY * 2) + 'px';
+    canvas.width  = (totalW + padX * 2) * dpr;
+    canvas.height = (ROWS * gap + padY * 2) * dpr;
+    ctx.scale(dpr, dpr);
+    buildLEDs(gap); draw();
+  }
+
+  window.addEventListener('load', function() { init(); setTimeout(scheduleFlicker, 1800); });
+  window.addEventListener('resize', init);
+}());
+</script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi Siamo — Pro Loco Barbarasco 54012</title>
+  <meta name="description" content="Pro Loco Barbarasco 54012. Un gruppo di amici cresciuti insieme tra le strade di Barbarasco, che ha trasformato un legame personale in un progetto collettivo.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,ital,wght@9..40,0,300;9..40,0,400;9..40,1,300&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { opacity: 0; transition: opacity .45s ease; }
+    :root {
+      --nero:   #080808;
+      --rosso:  #C41E2A;
+      --bianco: #F0EDE8;
+      --grigio: #888480;
+      --piombo: #2A2A2A;
+    }
+    body {
+      background: var(--nero);
+      color: var(--bianco);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── GRAIN ── */
+    .grain {
+      position: fixed; inset: -50%; width: 200%; height: 200%;
+      pointer-events: none; z-index: 200; opacity: .036;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation: grain-shift .45s steps(1) infinite;
+    }
+    @keyframes grain-shift {
+      0%{transform:translate(0,0)}10%{transform:translate(-2%,-3%)}20%{transform:translate(3%,2%)}
+      30%{transform:translate(-1%,4%)}40%{transform:translate(4%,-1%)}50%{transform:translate(-3%,3%)}
+      60%{transform:translate(2%,-4%)}70%{transform:translate(-4%,1%)}80%{transform:translate(1%,-2%)}
+      90%{transform:translate(-2%,4%)}100%{transform:translate(3%,-3%)}
+    }
+
+    /* ── PROGRESS ── */
+    #progress-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 1px;
+      z-index: 300; pointer-events: none;
+    }
+    #progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, transparent, var(--rosso));
+      box-shadow: 0 0 6px rgba(196,30,42,.8);
+    }
+
+    /* ── CURSOR ── */
+    #cur-dot {
+      position: fixed; width: 7px; height: 7px;
+      background: var(--rosso); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+    }
+    #cur-ring {
+      position: fixed; width: 40px; height: 40px;
+      border: 1px solid rgba(196,30,42,.5); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width .35s cubic-bezier(.16,1,.3,1), height .35s cubic-bezier(.16,1,.3,1);
+    }
+    body.cur-hover #cur-ring { width: 60px; height: 60px; border-color: rgba(196,30,42,.22); }
+
+    /* ── NAV ── */
+    #main-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      padding: 1.4rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .4s, border-color .4s;
+    }
+    #main-nav.scrolled {
+      background: rgba(8,8,8,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(196,30,42,.08);
+    }
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem; letter-spacing: .08em;
+      color: var(--bianco); text-decoration: none;
+    }
+    .nav-brand span { color: var(--rosso); }
+    .nav-back {
+      font-size: .58rem; letter-spacing: .22em; text-transform: uppercase;
+      color: rgba(136,132,128,.45); text-decoration: none;
+      transition: color .25s;
+    }
+    .nav-back:hover { color: var(--grigio); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+      position: relative; overflow: hidden;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(196,30,42,.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 20%, rgba(196,30,42,.04) 0%, transparent 50%),
+        var(--nero);
+    }
+
+    /* Subtle animated background lines */
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(196,30,42,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(196,30,42,.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      font-size: clamp(.5rem,.8vw,.62rem); letter-spacing: .32em; text-transform: uppercase;
+      color: rgba(196,30,42,.7); margin-bottom: 2.5rem;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .7s ease, transform .7s ease;
+      position: relative; z-index: 1;
+    }
+    .hero-tag.in { opacity: 1; transform: none; }
+
+    .hero-quote {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 11vw, 13rem);
+      line-height: .88; letter-spacing: -.01em;
+      max-width: 16ch;
+      position: relative; z-index: 1;
+    }
+    /* Each line reveals upward */
+    .hq-line { overflow: hidden; display: block; }
+    .hq-inner {
+      display: block;
+      transform: translateY(105%);
+      transition: transform .9s cubic-bezier(.16,1,.3,1);
+    }
+    .hq-inner.in { transform: translateY(0); }
+
+    /* Alternate lines: white vs red-outline */
+    .hq-line:nth-child(odd)  .hq-inner { color: var(--bianco); }
+    .hq-line:nth-child(even) .hq-inner {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(240,237,232,.45);
+    }
+
+    .hero-rule {
+      width: clamp(80px, 20vw, 180px); height: 1px;
+      background: var(--rosso); margin: 2.2rem 0;
+      box-shadow: 0 0 8px rgba(196,30,42,.5);
+      transform: scaleX(0); transform-origin: center;
+      transition: transform .6s .3s cubic-bezier(.16,1,.3,1);
+      position: relative; z-index: 1;
+    }
+    .hero-rule.in { transform: scaleX(1); }
+
+    .hero-sub {
+      font-size: clamp(.7rem, 1.2vw, .88rem); line-height: 1.85;
+      color: rgba(136,132,128,.8); max-width: 38ch;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity .8s .4s ease, transform .8s .4s ease;
+      position: relative; z-index: 1;
+    }
+    .hero-sub.in { opacity: 1; transform: none; }
+    .hero-sub em { color: var(--bianco); font-style: normal; }
+
+    .scroll-hint {
+      position: absolute; bottom: 2rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      opacity: 0; transition: opacity .8s 1.2s ease;
+      pointer-events: none;
+    }
+    .scroll-hint.in { opacity: 1; }
+    .scroll-line {
+      width: 1px; height: 2.5rem;
+      background: linear-gradient(to bottom, rgba(196,30,42,.8), transparent);
+      animation: line-breath 2s ease-in-out infinite;
+    }
+    @keyframes line-breath { 0%,100%{opacity:.4;transform:scaleY(.7)} 50%{opacity:1;transform:scaleY(1)} }
+    .scroll-text { font-size: .48rem; letter-spacing: .26em; text-transform: uppercase; color: var(--grigio); }
+
+    /* ── MARQUEE ── */
+    #marquee-wrap {
+      overflow: hidden; padding: .9rem 0;
+      border-top: 1px solid rgba(196,30,42,.1);
+      border-bottom: 1px solid rgba(196,30,42,.1);
+    }
+    .marquee-track {
+      display: flex; gap: 3rem; width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .mq-i {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(.85rem,1.8vw,1.3rem); letter-spacing: .06em;
+      color: rgba(240,237,232,.16); flex-shrink: 0; white-space: nowrap;
+    }
+    .mq-i.r { color: rgba(196,30,42,.55); font-size: .7em; }
+
+    /* ── SECTION BASE ── */
+    .section { padding: clamp(5rem,10vh,9rem) 2rem; }
+    .inner { max-width: 1100px; margin: 0 auto; }
+    .inner-sm { max-width: 720px; margin: 0 auto; }
+
+    /* reveal */
+    .rev { opacity: 0; transform: translateY(22px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
+    .rev.in { opacity: 1; transform: none; }
+    .rev-left { opacity: 0; transform: translateX(-24px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
+    .rev-left.in { opacity: 1; transform: none; }
+
+    /* section label */
+    .sec-label {
+      font-size: .54rem; letter-spacing: .32em; text-transform: uppercase;
+      color: var(--rosso); margin-bottom: 1.2rem;
+      display: block;
+    }
+
+    /* ── ORIGINE ── */
+    #origine { border-top: 1px solid rgba(240,237,232,.05); }
+    .origine-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 6vw, 7rem); align-items: center;
+    }
+    @media (max-width: 720px) { .origine-grid { grid-template-columns: 1fr; } }
+
+    .og-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(8rem, 22vw, 22rem);
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(196,30,42,.22);
+      text-align: right;
+      user-select: none; pointer-events: none;
+    }
+
+    .og-text { }
+    .og-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      line-height: .9; color: var(--bianco);
+      margin-bottom: 1.4rem;
+    }
+    .og-body {
+      font-size: clamp(.72rem, 1.2vw, .85rem);
+      line-height: 1.95; color: rgba(136,132,128,.8);
+      max-width: 40ch;
+    }
+    .og-body em { color: var(--bianco); font-style: normal; }
+
+    /* ── PULL QUOTE ── */
+    #pull-quote {
+      padding: clamp(5rem,10vh,9rem) 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(240,237,232,.05);
+      border-bottom: 1px solid rgba(240,237,232,.05);
+      background: radial-gradient(ellipse at 50% 50%, rgba(196,30,42,.04) 0%, transparent 65%);
+    }
+    .pq-rule {
+      width: clamp(60px, 14vw, 120px); height: 1px;
+      background: var(--rosso); margin: 0 auto 2rem;
+      box-shadow: 0 0 8px rgba(196,30,42,.5);
+    }
+    .pq-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 6.5vw, 7.5rem);
+      line-height: .88; letter-spacing: -.01em;
+      max-width: 18ch; margin: 0 auto;
+    }
+    .pq-text .accent {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(240,237,232,.5);
+    }
+    .pq-rule-bottom {
+      width: clamp(60px, 14vw, 120px); height: 1px;
+      background: var(--rosso); margin: 2rem auto 0;
+      box-shadow: 0 0 8px rgba(196,30,42,.5);
+    }
+
+    /* ── VISIONE ── */
+    #visione { border-top: 1px solid rgba(240,237,232,.05); }
+    .visione-header {
+      margin-bottom: clamp(3rem, 6vh, 5rem);
+    }
+    .visione-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 8rem);
+      line-height: .88; color: var(--bianco);
+    }
+    .visione-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 5vw, 6rem);
+      border-top: 1px solid rgba(240,237,232,.06);
+      padding-top: clamp(2rem,5vh,3.5rem);
+    }
+    @media (max-width: 640px) { .visione-grid { grid-template-columns: 1fr; } }
+
+    .v-col-label {
+      font-size: .52rem; letter-spacing: .26em; text-transform: uppercase;
+      color: rgba(196,30,42,.7); margin-bottom: .9rem; display: block;
+    }
+    .v-col-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      line-height: .9; color: var(--bianco); margin-bottom: 1.1rem;
+    }
+    .v-col-body {
+      font-size: clamp(.7rem, 1.1vw, .82rem);
+      line-height: 1.95; color: rgba(136,132,128,.75);
+    }
+    .v-col-body em { color: var(--bianco); font-style: normal; }
+
+    /* ── MANIFESTO ── */
+    #manifesto {
+      padding: clamp(6rem,12vh,11rem) 2rem;
+      text-align: center;
+      border-top: 1px solid rgba(240,237,232,.05);
+    }
+    .man-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 7vw, 8.5rem);
+      line-height: .88; letter-spacing: -.01em;
+      max-width: 20ch; margin: 0 auto;
+      color: var(--bianco);
+    }
+    .man-text .dim { color: transparent; -webkit-text-stroke: 1px rgba(240,237,232,.22); }
+
+    /* ── CTA ── */
+    #cta-section {
+      padding: clamp(4rem,8vh,7rem) 2rem;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      border-top: 1px solid rgba(240,237,232,.05);
+    }
+    .cta-label {
+      font-size: .54rem; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--grigio); margin-bottom: 1.5rem;
+    }
+    .cta-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 7vw, 7rem);
+      line-height: .88; color: var(--bianco); margin-bottom: 2.5rem;
+    }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: .8rem;
+      border: 1px solid rgba(196,30,42,.4);
+      padding: .9rem 2.4rem;
+      font-size: .62rem; letter-spacing: .24em; text-transform: uppercase;
+      color: var(--bianco); text-decoration: none;
+      transition: background .3s, border-color .3s, color .3s;
+    }
+    .cta-btn:hover {
+      background: var(--rosso); border-color: var(--rosso);
+    }
+    .cta-btn svg { transition: transform .3s cubic-bezier(.16,1,.3,1); }
+    .cta-btn:hover svg { transform: translateX(4px); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--nero); padding: 5rem 2rem 3rem;
+      text-align: center;
+      border-top: 1px solid rgba(240,237,232,.05);
+    }
+    .ft-logo { margin: 0 auto 1.8rem; }
+    .ft-name { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: .08em; color: var(--bianco); }
+    .ft-sub  { font-size: .54rem; letter-spacing: .18em; text-transform: uppercase; color: var(--grigio); margin-top: .2rem; }
+    .ft-rule { width: 1px; height: 2.5rem; background: var(--piombo); margin: 2rem auto; }
+    .ft-ig {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .54rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--grigio); text-decoration: none; transition: color .2s;
+    }
+    .ft-ig:hover { color: var(--bianco); }
+    .ft-copy { font-size: .48rem; color: var(--piombo); letter-spacing: .1em; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div id="progress-bar"><div id="progress-fill"></div></div>
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<nav id="main-nav">
+  <a href="index.html" class="nav-brand">Barbarasco <span>54012</span></a>
+  <a href="index.html" class="nav-back">← Torna all'evento</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <span class="hero-tag" id="hero-tag">Pro Loco Barbarasco 54012 · Lunigiana · Toscana</span>
+
+  <h1 class="hero-quote" id="hero-quote">
+    <span class="hq-line"><span class="hq-inner">Ci sono</span></span>
+    <span class="hq-line"><span class="hq-inner">storie che non</span></span>
+    <span class="hq-line"><span class="hq-inner">nascono</span></span>
+    <span class="hq-line"><span class="hq-inner">attorno</span></span>
+    <span class="hq-line"><span class="hq-inner">a un tavolo.</span></span>
+  </h1>
+
+  <div class="hero-rule" id="hero-rule"></div>
+
+  <p class="hero-sub" id="hero-sub">
+    Nascono lungo le strade di un paese,<br>
+    tra <em>risate condivise</em>, sogni detti ad alta voce<br>
+    e legami che crescono con il tempo.
+  </p>
+
+  <div class="scroll-hint" id="scroll-hint">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scopri</span>
+  </div>
+</section>
+
+<!-- ── MARQUEE ── -->
+<div id="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="mq-i r">✦</span><span class="mq-i">Barbarasco</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Lunigiana</span>
+    <span class="mq-i r">✦</span><span class="mq-i">54012</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Memoria Viva</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Identità</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Pro Loco</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Radici e Visione</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Fare · Creare · Lasciare un segno</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Dal 2025</span>
+    <span class="mq-i r">✦</span>
+    <!-- duplicate -->
+    <span class="mq-i">Barbarasco</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Lunigiana</span>
+    <span class="mq-i r">✦</span><span class="mq-i">54012</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Memoria Viva</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Identità</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Pro Loco</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Radici e Visione</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Fare · Creare · Lasciare un segno</span>
+    <span class="mq-i r">✦</span><span class="mq-i">Dal 2025</span>
+    <span class="mq-i r">✦</span>
+  </div>
+</div>
+
+<!-- ── ORIGINE ── -->
+<section id="origine" class="section">
+  <div class="inner">
+    <div class="origine-grid">
+      <div class="og-number rev">20</div>
+      <div class="og-text">
+        <span class="sec-label rev">L'origine</span>
+        <h2 class="og-heading rev">Un gruppo<br>di amici</h2>
+        <p class="og-body rev">
+          La Pro Loco Barbarasco 54012 nasce da un gruppo di amici che è cresciuto insieme,
+          che ha vissuto gli stessi luoghi, le stesse piazze, le stesse tradizioni,
+          trasformando un <em>legame personale in un progetto collettivo</em>.<br><br>
+          Siamo ragazzi con un'età media di circa <em>20 anni</em>, ma portiamo con noi
+          qualcosa che va oltre l'anagrafe: un senso profondo di appartenenza.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PULL QUOTE ── -->
+<div id="pull-quote">
+  <div class="pq-rule rev"></div>
+  <p class="pq-text rev">
+    Barbarasco<br>
+    non è solo <span class="accent">casa</span>,<br>
+    è <span class="accent">memoria</span><br>
+    viva, è <span class="accent">identità</span>.
+  </p>
+  <div class="pq-rule-bottom rev"></div>
+</div>
+
+<!-- ── VISIONE ── -->
+<section id="visione" class="section">
+  <div class="inner">
+    <div class="visione-header">
+      <span class="sec-label rev-left">La visione</span>
+      <h2 class="visione-title rev-left">
+        Non solo eventi.<br>
+        Una storia.
+      </h2>
+    </div>
+    <div class="visione-grid">
+      <div class="rev">
+        <span class="v-col-label">L'ambizione</span>
+        <h3 class="v-col-heading">Raccontare<br>il territorio</h3>
+        <p class="v-col-body">
+          La nostra ambizione è chiara: non limitarci a organizzare eventi,
+          ma <em>raccontare una storia</em> — la nostra — intrecciandola con quella del territorio.<br><br>
+          Vogliamo dare forma a qualcosa di unico, che rappresenti ciò che siamo stati,
+          ciò che siamo oggi e ciò che vogliamo diventare.
+        </p>
+      </div>
+      <div class="rev">
+        <span class="v-col-label">Il progetto</span>
+        <h3 class="v-col-heading">Passato e<br>futuro insieme</h3>
+        <p class="v-col-body">
+          Un progetto capace di <em>unire passato e futuro</em>, tradizione e nuove idee,
+          radici e visione.<br><br>
+          Con entusiasmo, energia e spirito di squadra, lavoriamo per trasformare
+          le nostre idee in <em>iniziative concrete</em>, capaci di coinvolgere la comunità
+          e valorizzare il nostro paese.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MANIFESTO ── -->
+<section id="manifesto">
+  <p class="man-text rev">
+    Ci muove<br>
+    la volontà<br>
+    <span class="dim">di fare,</span><br>
+    <span class="dim">di creare,</span><br>
+    di lasciare<br>
+    un segno.
+  </p>
+</section>
+
+<!-- ── CTA ── -->
+<section id="cta-section">
+  <span class="cta-label rev">Il primo passo</span>
+  <h2 class="cta-heading rev">LOCURA<br>11.07.2026</h2>
+  <a href="index.html" class="cta-btn rev">
+    Scopri l'evento
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  </a>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="ft-logo">
+    <div style="position:relative;display:inline-block;">
+      <svg viewBox="0 0 320 210" width="60" height="40" fill="none" xmlns="http://www.w3.org/2000/svg" color="#F0EDE8">
+        <defs><clipPath id="ft-go"><ellipse cx="160" cy="105" rx="144" ry="90"/></clipPath></defs>
+        <ellipse cx="160" cy="105" rx="158" ry="101" stroke="currentColor" stroke-width="5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="148" ry="94" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        <ellipse cx="160" cy="105" rx="144" ry="90" fill="#0a0a0a"/>
+        <g clip-path="url(#ft-go)" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.45">
+          <ellipse cx="160" cy="105" rx="144" ry="18"/><ellipse cx="160" cy="105" rx="144" ry="40"/>
+          <ellipse cx="160" cy="105" rx="144" ry="62"/><ellipse cx="160" cy="105" rx="114" ry="90"/>
+        </g>
+        <line x1="160" y1="0" x2="160" y2="210" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="0" y1="105" x2="320" y2="105" stroke="currentColor" stroke-width="1.5"/>
+        <rect x="16" y="65" width="288" height="80" fill="#080808"/>
+        <line x1="16" y1="65" x2="304" y2="65" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="16" y1="145" x2="304" y2="145" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-style:italic;font-size:.72rem;color:#F0EDE8;white-space:nowrap;pointer-events:none;">54012</span>
+    </div>
+  </div>
+  <div class="ft-name">Pro Loco Barbarasco 54012</div>
+  <div class="ft-sub">Barbarasco, Massa-Carrara — Toscana</div>
+  <div class="ft-rule"></div>
+  <a href="https://www.instagram.com/barbarasco54012/" target="_blank" rel="noopener" class="ft-ig">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+    </svg>
+    @barbarasco54012
+  </a>
+  <div class="ft-copy">© 2026 Pro Loco Barbarasco 54012 — Tutti i diritti riservati</div>
+</footer>
+
+<script>
+(function () {
+'use strict';
+
+/* ── PAGE LOAD ── */
+window.addEventListener('load', function () {
+  document.documentElement.style.opacity = '1';
+
+  /* Hero stagger */
+  var tag  = document.getElementById('hero-tag');
+  var rule = document.getElementById('hero-rule');
+  var sub  = document.getElementById('hero-sub');
+  var hint = document.getElementById('scroll-hint');
+
+  if (tag)  setTimeout(function(){ tag.classList.add('in'); }, 100);
+
+  /* Lines stagger */
+  var inners = document.querySelectorAll('.hq-inner');
+  inners.forEach(function(el, i){
+    setTimeout(function(){ el.classList.add('in'); }, 200 + i * 110);
+  });
+
+  if (rule) setTimeout(function(){ rule.classList.add('in'); }, 200 + inners.length * 110);
+  if (sub)  setTimeout(function(){ sub.classList.add('in');  }, 350 + inners.length * 110);
+  if (hint) setTimeout(function(){ hint.classList.add('in'); }, 900);
+});
+
+/* ── PROGRESS ── */
+var pFill = document.getElementById('progress-fill');
+window.addEventListener('scroll', function () {
+  var p = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  if (pFill) pFill.style.width = Math.min(p * 100, 100) + '%';
+}, { passive: true });
+
+/* ── NAV ── */
+var nav = document.getElementById('main-nav');
+window.addEventListener('scroll', function () {
+  if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
+}, { passive: true });
+
+/* ── CURSOR ── */
+var curDot  = document.getElementById('cur-dot');
+var curRing = document.getElementById('cur-ring');
+var mx = -200, my = -200, rx = -200, ry = -200;
+document.addEventListener('mousemove', function (e) {
+  mx = e.clientX; my = e.clientY;
+  curDot.style.left = mx + 'px';
+  curDot.style.top  = my + 'px';
+}, { passive: true });
+(function ringLoop() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  curRing.style.left = rx + 'px';
+  curRing.style.top  = ry + 'px';
+  requestAnimationFrame(ringLoop);
+})();
+document.querySelectorAll('a, button').forEach(function (el) {
+  el.addEventListener('mouseenter', function () { document.body.classList.add('cur-hover'); });
+  el.addEventListener('mouseleave', function () { document.body.classList.remove('cur-hover'); });
+});
+
+/* ── INTERSECTION OBSERVER (scroll reveals) ── */
+var obs = new IntersectionObserver(function (entries) {
+  entries.forEach(function (e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.rev, .rev-left').forEach(function (el) { obs.observe(el); });
+
+}());
+</script>
+</body>
+</html>
