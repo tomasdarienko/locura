@@ -153,7 +153,7 @@
     }
     .p-lineup.in { opacity: 1; transform: none; }
     .p-lrow {
-      display: flex; align-items: baseline; justify-content: center;
+      display: flex; align-items: flex-start; justify-content: center;
       gap: clamp(0.6rem, 2vw, 2rem);
       padding: clamp(0.2rem, 0.6vh, 0.45rem) 0;
       border-top: 1px solid rgba(240,237,232,0.05);
@@ -194,6 +194,15 @@
       opacity: 0; transition: opacity 800ms 800ms cubic-bezier(0.16,1,0.3,1);
     }
     .p-inspired.in { opacity: 1; }
+
+    /* ── Lineup genre tag ── */
+    .p-lgenre {
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.4rem, 0.85vw, 0.5rem);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--rosso); font-weight: 400; margin-top: 0.12rem;
+    }
 
     /* ── Scroll indicator ── */
     #loc-scroll-ind {
@@ -414,6 +423,56 @@
     .lf-ig { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grigio); text-decoration: none; transition: color 200ms; }
     .lf-ig:hover { color: var(--bianco); }
     .lf-copy { font-size: 0.55rem; color: var(--piombo); letter-spacing: 0.1em; margin-top: 1.5rem; }
+
+    /* ══ PRATICHE ══ */
+    #loc-details { background: var(--nero); padding: 6rem 2rem 5rem; border-top: 1px solid var(--piombo); }
+    .ld-inner { max-width: 860px; margin: 0 auto; }
+    .ld-eyebrow { font-size: 0.48rem; letter-spacing: 0.34em; text-transform: uppercase; color: var(--grigio); text-align: center; margin-bottom: 3rem; }
+    .ld-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 700px) { .ld-grid { grid-template-columns: 1fr; } }
+    .ld-card { padding: 0 2rem; border-left: 1px solid rgba(196,30,42,0.12); }
+    .ld-card:first-child { border-left: none; padding-left: 0; }
+    @media (max-width: 700px) {
+      .ld-card { border-left: none; border-top: 1px solid rgba(196,30,42,0.12); padding: 2rem 0 0; margin-top: 2rem; }
+      .ld-card:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    }
+    .ld-label { font-size: 0.46rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--grigio); margin-bottom: 0.8rem; display: block; }
+    .ld-val { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.5rem, 3.5vw, 2.4rem); line-height: 1; color: var(--bianco); margin-bottom: 0.7rem; }
+    .ld-sub { font-size: clamp(0.58rem, 1.2vw, 0.66rem); color: var(--grigio); line-height: 1.75; letter-spacing: 0.04em; }
+    .ld-sub em { color: var(--bianco); font-style: normal; }
+    .ld-phones { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .ld-phone { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.05em; color: var(--bianco); text-decoration: none; transition: color 200ms; }
+    .ld-phone:hover { color: var(--rosso); }
+    .ld-phone svg { color: var(--rosso); flex-shrink: 0; }
+    .ld-services { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .ld-service-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grigio); }
+    .ld-service-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--rosso); flex-shrink: 0; }
+
+    /* ══ MENU ══ */
+    #loc-menu { background: #0d0d0d; padding: 6rem 2rem 5rem; border-top: 1px solid var(--piombo); }
+    .lm-inner { max-width: 900px; margin: 0 auto; }
+    .lm-eyebrow { font-size: 0.48rem; letter-spacing: 0.34em; text-transform: uppercase; color: var(--grigio); text-align: center; margin-bottom: 3rem; }
+    .lm-grid { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 4rem; }
+    @media (max-width: 700px) { .lm-grid { grid-template-columns: 1fr; gap: 3rem; } }
+    .lm-divider { background: var(--piombo); }
+    @media (max-width: 700px) { .lm-divider { display: none; } }
+    .lm-col-head { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 5vw, 3rem); line-height: 1; color: var(--bianco); margin-bottom: 0.2rem; }
+    .lm-col-time { font-size: 0.46rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rosso); margin-bottom: 1.8rem; }
+    .lm-cat { font-size: 0.44rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--grigio); padding: 0.9rem 0 0.4rem; border-bottom: 1px solid rgba(196,30,42,0.1); margin-bottom: 0.2rem; }
+    .lm-row { display: flex; justify-content: space-between; align-items: baseline; padding: 0.55rem 0; border-bottom: 1px solid rgba(240,237,232,0.04); gap: 1rem; }
+    .lm-row-info { flex: 1; }
+    .lm-row-name { font-size: clamp(0.6rem, 1.4vw, 0.72rem); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bianco); display: block; }
+    .lm-row-sub { font-size: 0.48rem; letter-spacing: 0.06em; color: var(--grigio); margin-top: 0.1rem; display: block; }
+    .lm-row-price { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--rosso); flex-shrink: 0; }
+    .lm-variants { border-bottom: 1px solid rgba(240,237,232,0.04); }
+    .lm-variant { display: flex; justify-content: space-between; align-items: baseline; padding: 0.4rem 0 0.4rem 1rem; gap: 1rem; border-bottom: 1px solid rgba(240,237,232,0.03); }
+    .lm-variant:last-child { border-bottom: none; }
+    .lm-variant-name { font-size: 0.6rem; letter-spacing: 0.06em; color: var(--bianco); flex: 1; }
+    .lm-variant-price { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--rosso); flex-shrink: 0; }
+    .lm-contacts { margin-top: 2rem; padding-top: 1.4rem; border-top: 1px solid rgba(196,30,42,0.12); }
+    .lm-contacts-label { font-size: 0.44rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--grigio); margin-bottom: 0.7rem; }
+    .lm-phone { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.05em; color: var(--bianco); text-decoration: none; transition: color 200ms; margin-bottom: 0.3rem; }
+    .lm-phone:hover { color: var(--rosso); }
   </style>
 </head>
 <body>
@@ -475,25 +534,21 @@
 
     <div class="p-lineup" id="p-lineup">
       <div class="p-lrow">
-        <span class="p-ltime">22:00</span>
-        <span class="p-lname">Selezione Tech House</span>
-      </div>
-      <div class="p-lrow">
         <span class="p-ltime">23:00</span>
-        <span class="p-lname">DJ Nash</span>
+        <span class="p-lname">DJ Nash<span class="p-lgenre">Tech-House</span></span>
       </div>
       <div class="p-lrow">
         <span class="p-ltime">01:00</span>
-        <span class="p-lname">Technobrother</span>
+        <span class="p-lname">TCBR<span class="p-lgenre">Techno · Hard Dance</span></span>
       </div>
       <div class="p-lrow">
-        <span class="p-ltime">02:00</span>
-        <span class="p-lname">Blace</span>
+        <span class="p-ltime">02:30</span>
+        <span class="p-lname">Blace.MSK<span class="p-lgenre">Trance · Techno</span></span>
       </div>
     </div>
 
-    <span class="p-venue" id="p-venue">Parco Fiera di Barbarasco · Ore 18:00</span>
-    <span class="p-entry" id="p-entry">Ingresso libero fino alle 00:30 · €5 dopo mezzanotte</span>
+    <span class="p-venue" id="p-venue">Parco Fiera di Barbarasco · Ore 19:00</span>
+    <span class="p-entry" id="p-entry">Ingresso gratuito fino alle 00:30 · 10€ con consumazione dopo le 00:30</span>
 
     <span class="p-inspired" id="p-inspired">Inspired by Circoloco</span>
   </div>
@@ -579,7 +634,7 @@
     <div class="ml-e-label">— Parco Fiera —</div>
     <div class="ml-e-venue">Barbarasco</div>
     <div class="ml-e-coords">44°03′26″N &nbsp; 10°05′52″E</div>
-    <div class="ml-e-date">11 · 07 · 2026 &nbsp;·&nbsp; Ore 18:00</div>
+    <div class="ml-e-date">11 · 07 · 2026 &nbsp;·&nbsp; Ore 19:00</div>
     <div class="ml-e-cd">
       <div class="ml-cd-block">
         <span class="ml-cd-num" id="lcd-days">54</span>
@@ -602,12 +657,167 @@
       </div>
     </div>
     <div class="ml-e-entry">
-      <span>Ingresso libero fino alle 00:30</span>
+      <span>Ingresso gratuito fino alle 00:30</span>
       <div class="ml-e-entry-sep"></div>
-      <span style="color:var(--rosso)">€5 dopo mezzanotte</span>
+      <span style="color:var(--rosso)">10€ con consumazione dopo le 00:30</span>
     </div>
   </div>
 
+</section>
+
+<!-- ══ PRATICHE ══ -->
+<section id="loc-details">
+  <div class="ld-inner">
+    <div class="ld-eyebrow">Info Pratiche</div>
+    <div class="ld-grid">
+
+      <div class="ld-card">
+        <span class="ld-label">Apertura</span>
+        <div class="ld-val">Dalle ore 19:00</div>
+        <div class="ld-sub">Cena su prenotazione</div>
+        <div class="ld-phones">
+          <a href="https://wa.me/393200754496" class="ld-phone" target="_blank" rel="noopener">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.54a16 16 0 0 0 6.55 6.55l1.1-1.1a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            320 075 4496
+          </a>
+          <a href="https://wa.me/393888553297" class="ld-phone" target="_blank" rel="noopener">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.54a16 16 0 0 0 6.55 6.55l1.1-1.1a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            388 855 3297
+          </a>
+        </div>
+      </div>
+
+      <div class="ld-card">
+        <span class="ld-label">Ingresso</span>
+        <div class="ld-val">Gratuito</div>
+        <div class="ld-sub">Fino alle 00:30<br><em>10€ con consumazione inclusa</em><br>dopo le 00:30</div>
+      </div>
+
+      <div class="ld-card">
+        <span class="ld-label">Street Food &amp; Servizi</span>
+        <div class="ld-val">Dalle ore 22:00</div>
+        <div class="ld-services">
+          <div class="ld-service-item"><span class="ld-service-dot"></span>Alcol Games</div>
+          <div class="ld-service-item"><span class="ld-service-dot"></span>Drink Bar</div>
+          <div class="ld-service-item"><span class="ld-service-dot"></span>Food Stand</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ MENU ══ -->
+<section id="loc-menu">
+  <div class="lm-inner">
+    <div class="lm-eyebrow">Menu</div>
+    <div class="lm-grid">
+
+      <div class="lm-col">
+        <div class="lm-col-head">Menu Cena</div>
+        <div class="lm-col-time">Dalle ore 19:00</div>
+
+        <div class="lm-cat">Panigacci di Podenzana e Salumi</div>
+        <div style="padding: 0.3rem 0 0; border-bottom: 1px solid rgba(240,237,232,0.04);">
+          <span class="lm-row-sub" style="margin-top:0; padding-bottom: 0.4rem; display: block;">Crudo · Coppa · Pancetta</span>
+        </div>
+        <div class="lm-variants">
+          <div class="lm-variant">
+            <span class="lm-variant-name">Standard · x2 persone</span>
+            <span class="lm-variant-price">10,00€</span>
+          </div>
+          <div class="lm-variant">
+            <span class="lm-variant-name">Large · x4 persone</span>
+            <span class="lm-variant-price">18,00€</span>
+          </div>
+        </div>
+
+        <div class="lm-cat">Grigliata Mista</div>
+        <div class="lm-row">
+          <div class="lm-row-info">
+            <span class="lm-row-name">Grigliata Mista</span>
+            <span class="lm-row-sub">Rosticciana ×3 · Salsiccia ×1 · Coppa ×1</span>
+          </div>
+          <span class="lm-row-price">15,00€</span>
+        </div>
+
+        <div class="lm-cat">Accompagnamenti</div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Chiodo</span></div>
+          <span class="lm-row-price">4,00€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Stracchino</span></div>
+          <span class="lm-row-price">3,00€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Gorgonzola</span></div>
+          <span class="lm-row-price">3,00€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Patatine Fritte</span></div>
+          <span class="lm-row-price">3,50€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Nutella</span></div>
+          <span class="lm-row-price">1,00€</span>
+        </div>
+
+        <div class="lm-contacts">
+          <div class="lm-contacts-label">Prenotazioni cena</div>
+          <a href="https://wa.me/393200754496" class="lm-phone" target="_blank" rel="noopener">320 075 4496</a>
+          <a href="https://wa.me/393888553297" class="lm-phone" target="_blank" rel="noopener">388 855 3297</a>
+        </div>
+      </div>
+
+      <div class="lm-divider"></div>
+
+      <div class="lm-col">
+        <div class="lm-col-head">Street Food</div>
+        <div class="lm-col-time">Dalle ore 22:00</div>
+
+        <div class="lm-row">
+          <div class="lm-row-info">
+            <span class="lm-row-name">Panigaccio Farcito</span>
+            <span class="lm-row-sub">Crudo · Coppa · Pancetta · Stracchino · Gorgonzola</span>
+          </div>
+          <span class="lm-row-price">3,50€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Panigaccio Doppia Farcitura</span></div>
+          <span class="lm-row-price">4,00€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Panigaccio con Chiodo</span></div>
+          <span class="lm-row-price">4,50€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Panigaccio con Nutella</span></div>
+          <span class="lm-row-price">3,50€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Patatine Fritte</span></div>
+          <span class="lm-row-price">3,50€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Panino con Chiodo</span></div>
+          <span class="lm-row-price">6,00€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info"><span class="lm-row-name">Sgabeo Vuoto</span></div>
+          <span class="lm-row-price">1,50€</span>
+        </div>
+        <div class="lm-row">
+          <div class="lm-row-info">
+            <span class="lm-row-name">Sgabeo Farcito</span>
+            <span class="lm-row-sub">Stracchino · Crudo · Coppa · Pancetta</span>
+          </div>
+          <span class="lm-row-price">3,00€</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </section>
 
 <!-- ══ FOOTER ══ -->
@@ -647,7 +857,7 @@
     </svg>
     @barbarasco54012
   </a>
-  <div class="lf-copy">© 2025 Pro Loco Barbarasco 54012 — Tutti i diritti riservati</div>
+  <div class="lf-copy">© 2026 Pro Loco Barbarasco 54012 — Tutti i diritti riservati</div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -858,7 +1068,7 @@
   });
 
   // ── Countdown ────────────────────────────────────────────────
-  var cdTarget = new Date('2026-07-11T18:00:00');
+  var cdTarget = new Date('2026-07-11T19:00:00');
   function pad(n) { return String(n).padStart(2, '0'); }
   function updateCD() {
     var diff = cdTarget - new Date();
